@@ -117,14 +117,28 @@ PATCH  /api/{resources}/{id}     # 部分更新（仅 CRUD 资源）
 DELETE /api/{resources}/{id}     # 删除（仅 CRUD 资源）
 ```
 
-### 嵌套路由（子资源）
+### 子资源路由（独立路由 + 参数过滤）
+
+子资源不使用嵌套路由，统一用独立路由 + 参数过滤：
 
 ```
-GET /api/tv-shows/{id}/seasons           # 某剧的所有季
-GET /api/tv-shows/{id}/seasons/{season_number}/episodes  # 某季的所有集
-GET /api/movies/{id}/credits             # 某电影的演职人员
-GET /api/persons/{id}/credits            # 某人物的参演记录
+# 电影相关子资源
+GET /api/movie-credits?movie_id=123
+GET /api/movie-images?movie_id=123
+GET /api/movie-genres?movie_id=123
+GET /api/movie-keywords?movie_id=123
+GET /api/movie-production-companies?movie_id=123
+
+# TV 相关子资源
+GET /api/tv-seasons?tv_show_id=456
+GET /api/tv-episodes?tv_season_id=789
+GET /api/tv-show-creators?tv_show_id=456
+GET /api/tv-show-images?tv_show_id=456
+GET /api/tv-episode-credits?tv_episode_id=101
+GET /api/tv-episode-images?tv_episode_id=101
 ```
+
+父资源 ID 参数在 FormRequest 中为必填项，缺少时返回 422。
 
 ### 命名规范
 
