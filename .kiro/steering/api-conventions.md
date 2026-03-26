@@ -184,7 +184,29 @@ GET /api/tv-episode-images?tv_episode_id=101
 
 ---
 
-## 日期时间格式
+## 全局搜索规范
+
+接口：`GET /api/search?q={keyword}`
+
+- `q` 参数必填，最短 1 字符，最长 100 字符
+- 并发查询 movies（title / original_title）、tv_shows（name / original_name）、persons（name）三张主表
+- 每表最多返回 10 条，走 `LIKE keyword%` 前缀匹配
+- 不分页，不支持排序
+- 响应结构：
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "movies":   [...],
+    "tv_shows": [...],
+    "persons":  [...]
+  }
+}
+```
+
+---
 
 - 日期字段：`Y-m-d`，如 `"release_date": "2023-07-12"`
 - 时间戳字段：ISO 8601，如 `"created_at": "2023-07-12T10:30:00Z"`

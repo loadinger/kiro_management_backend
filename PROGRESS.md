@@ -12,6 +12,7 @@
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
 | S-01 | Auth：login / logout / refresh / me | 待开始 | 骨架已实现，待完善测试 |
+| S-02 | Global Search：`GET /api/search?q=` | 待开始 | 跨表搜索 movies / tv_shows / persons，每表 ≤ 10 条 |
 
 ### Movies
 | # | 接口 | 状态 | 备注 |
@@ -168,6 +169,33 @@ GET /api/tv-episodes?tv_season_id=789
 **决策：** 所有列表接口统一走分页，包括 countries / languages 等小表
 
 **原因：** 保持接口响应结构一致，前端统一处理逻辑。
+
+---
+
+### ADR-007 — 搜索方案（2026-03-26）
+
+**决策：** 两层搜索策略，不引入独立搜索引擎
+
+**列表页搜索：** 各模块列表接口的 `search` 参数，走 `LIKE keyword%`（前缀匹配，能利用索引），针对主要文本字段（title、name 等）。
+
+**全局搜索：** 独立接口 `GET /api/search?q=keyword`，并发查询 movies / tv_shows / persons 三张主表，每表最多返回 10 条，合并返回，不分页。
+
+```json
+{
+  "code": 0,
+  "data": {
+    "movies":   [...],
+    "tv_shows": [...],
+    "persons":  [...]
+  }
+}
+```
+
+**原因：** 管理后台搜索频率低，用户通常知道目标类型。方案实现简单，性能可控。后续如有复杂搜索需求再引入 MeiliSearch。
+
+---
+
+## 待决策事项
 
 - [ ] 生产环境部署方案（服务器/容器化）
 - [ ] 专题文章模块的具体字段设计
