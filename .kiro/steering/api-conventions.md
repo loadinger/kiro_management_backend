@@ -42,60 +42,136 @@
 }
 ```
 
-### 常用 code 值
+### code 值定义
 
-| code | 含义 |
-|------|------|
-| 0 | 成功 |
-| 401 | 未认证 / Token 无效 |
-| 403 | 无权限 |
-| 404 | 资源不存在 |
-| 422 | 参数验证失败 |
-| 500 | 服务器内部错误 |
+| code | 含义 | 触发场景 |
+|------|------|---------|
+| 0 | 成功 | 正常响应 |
+| 401 | 未认证 | Token 缺失、无效、过期 |
+| 403 | 无权限 | 已认证但无操作权限（暂未使用） |
+| 404 | 资源不存在 | findById 返回 null |
+| 422 | 参数验证失败 | FormRequest 验证不通过 |
+| 500 | 服务器内部错误 | 未捕获异常 |
+
+---
 
 ## 分页规范
 
-- 参数：`page`（默认 1）、`per_page`（默认 20，最大 100）
-- 大表（movies、persons、tv_episodes 等）限制 `page` 最大 1000，超出返回 422
-- 响应中必须包含 `meta.total`、`meta.page`、`meta.per_page`、`meta.last_page`
+### 请求参数
 
-## 路由命名规范
+| 参数 | 类型 | 默认值 | 限制 | 说明 |
+|------|------|--------|------|------|
+| `page` | int | 1 | 最大 1000（大表） | 页码 |
+| `per_page` | int | 20 | 最大 100 | 每页条数 |
+
+大表（`movies`、`persons`、`tv_episodes` 等）`page` 超过 1000 时返回 422。
+
+### 响应结构
+
+```json
+"data": {
+  "items": [...],
+  "meta": {
+    "total": 1000000,
+    "page": 1,
+    "per_page": 20,
+    "last_page": 50000
+  }
+}
+```
+
+---
+
+## 筛选与排序参数规范
+
+### 筛选参数
+
+- 参数名与字段名保持一致，使用小写下划线
+- 多值筛选用逗号分隔字符串：`?genre_ids=1,2,3`
+- 范围筛选用 `_min` / `_max` 后缀：`?release_date_min=2020-01-01&release_date_max=2023-12-31`
+- 布尔筛选用 `0` / `1`：`?adult=0`
+
+### 排序参数
+
+- 参数名：`sort`（字段）+ `order`（方向，`asc` / `desc`，默认 `desc`）
+- 排序字段必须白名单校验，禁止直接传入数据库
+- 每个接口在 FormRequest 中声明允许的排序字段
 
 ```
-GET    /api/movies              # 列表
-GET    /api/movies/{id}         # 详情
-POST   /api/movies              # 创建（仅 CRUD 资源）
-PUT    /api/movies/{id}         # 更新（仅 CRUD 资源）
-DELETE /api/movies/{id}         # 删除（仅 CRUD 资源）
+GET /api/movies?sort=popularity&order=desc
+GET /api/movies?sort=release_date&order=asc
 ```
 
-- 资源名用复数、小写、连字符：`tv-shows`、`tv-seasons`
-- 版本前缀暂不加，后续有需要再引入 `/api/v2/`
+---
 
-## 认证
+## 路由规范
 
-- 登录：`POST /api/auth/login`，返回 JWT token
+### RESTful 路由结构
+
+```
+GET    /api/{resources}          # 列表
+GET    /api/{resources}/{id}     # 详情
+POST   /api/{resources}          # 创建（仅 CRUD 资源）
+PUT    /api/{resources}/{id}     # 全量更新（仅 CRUD 资源）
+PATCH  /api/{resources}/{id}     # 部分更新（仅 CRUD 资源）
+DELETE /api/{resources}/{id}     # 删除（仅 CRUD 资源）
+```
+
+### 嵌套路由（子资源）
+
+```
+GET /api/tv-shows/{id}/seasons           # 某剧的所有季
+GET /api/tv-shows/{id}/seasons/{season_number}/episodes  # 某季的所有集
+GET /api/movies/{id}/credits             # 某电影的演职人员
+GET /api/persons/{id}/credits            # 某人物的参演记录
+```
+
+### 命名规范
+
+- 资源名：复数、小写、连字符，如 `tv-shows`、`tv-seasons`、`production-companies`
+- 路由参数：小写下划线，如 `{tv_show_id}`、`{season_number}`
+- 版本前缀：暂不加，后续引入 `/api/v2/`
+
+---
+
+## 认证规范
+
+- 登录：`POST /api/auth/login`（唯一无需认证的接口）
 - 刷新：`POST /api/auth/refresh`
 - 登出：`POST /api/auth/logout`
-- 受保护路由统一加 `auth:api` middleware
+- 当前用户：`GET /api/auth/me`
+- 所有业务接口加 `auth:api` middleware
 - 请求头：`Authorization: Bearer {token}`
+- Token 过期返回 `{"code": 401, "message": "未认证，请先登录", "data": null}`
 
-## 图片 URL
+---
 
-数据库中存储的是 TMDB 相对路径（如 `/abc123.jpg`），API 输出时由 Resource 层统一拼接完整 URL：
+## 图片 URL 规范
 
-```
-https://image.tmdb.org/t/p/{size}{path}
-```
+数据库存储 TMDB 相对路径（如 `/abc123.jpg`），API 输出时由 Resource 层统一拼接。
 
-size 常用值：`w185`、`w342`、`w500`、`original`
+- 实现：`App\Helpers\ImageHelper::url(?string $path, string $size): ?string`
+- path 为 null 时返回 null
+- 禁止在 Controller 层拼接图片 URL
 
-Resource 中统一处理，Controller 不做拼接。
+各实体推荐 size 见 `.kiro/steering/data-flow.md`。
+
+---
 
 ## 命名规范
 
-- Controller 方法：`index`、`show`、`store`、`update`、`destroy`
-- Service 方法：动词开头，如 `getMovieList`、`findMovieById`
-- Repository 方法：`findById`、`paginate`、`findByTmdbId`
-- FormRequest 类名：`{Action}{Resource}Request`，如 `ListMovieRequest`、`StoreArticleRequest`
-- Resource 类名：`{Resource}Resource`、`{Resource}Collection`
+| 类型 | 规范 | 示例 |
+|------|------|------|
+| Controller 方法 | RESTful 标准动词 | `index`、`show`、`store`、`update`、`destroy` |
+| Service 方法 | 动词开头驼峰 | `getList`、`findById`、`findMovieById` |
+| Repository 方法 | 语义化动词 | `findById`、`paginate`、`findByTmdbId`、`paginateWithFilters` |
+| FormRequest 类 | `{Action}{Resource}Request` | `ListMovieRequest`、`StoreArticleRequest` |
+| Resource 类 | `{Resource}Resource` | `MovieResource`、`TvShowResource` |
+
+---
+
+## 日期时间格式
+
+- 日期字段：`Y-m-d`，如 `"release_date": "2023-07-12"`
+- 时间戳字段：ISO 8601，如 `"created_at": "2023-07-12T10:30:00Z"`
+- 时区：统一 UTC
