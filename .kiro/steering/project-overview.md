@@ -73,3 +73,13 @@ routes/
 - 可写：users（管理员账号）、专题文章（待规划）
 
 详见 `.kiro/steering/data-flow.md`。
+
+## 语言约定
+
+| 场景 | 语言 |
+|------|------|
+| Kiro 与用户交流 | 中文 |
+| Spec 文档（requirements.md、design.md、tasks.md） | 中文 |
+| 代码注释、PHPDoc | 英文 |
+| 变量名、类名、方法名等代码标识符 | 英文 |
+| 日志输出 | 英文 |

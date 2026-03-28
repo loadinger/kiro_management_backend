@@ -67,13 +67,11 @@
 ### 基础参考数据
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
-| R-01 | Countries：list | 待开始 | 小表，可缓存 |
-| R-02 | Departments：list | 待开始 | 小表，可缓存 |
-| R-03 | Genres：list | 待开始 | 小表，可缓存 |
-| R-04 | Jobs：list | 待开始 | 小表，可缓存 |
-| R-05 | Keywords：list | 待开始 | 数十万条，支持搜索 |
-| R-06 | Languages：list | 待开始 | 小表，可缓存 |
-| R-07 | Production Companies：list | 待开始 | 数十万条，支持搜索 |
+| R-01 | Reference Data：countries / departments / genres / jobs / keywords / languages 列表+搜索 | 待开始 | 同一 Spec 实现 |
+| R-02 | Production Companies：列表+搜索+详情 | 待开始 | 同一 Spec 实现 |
+| R-03 | TV Networks：列表+搜索+详情 | 待开始 | 同一 Spec 实现 |
+
+> R-01 / R-02 / R-03 合并在同一个 Spec：`.kiro/specs/reference-data/`
 
 ---
 
