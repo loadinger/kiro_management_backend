@@ -7,39 +7,38 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 class BaseController extends Controller
 {
     protected function success(mixed $data = null, string $message = 'success'): JsonResponse
     {
         return response()->json([
-            'code'    => 0,
+            'code' => 0,
             'message' => $message,
-            'data'    => $data,
+            'data' => $data,
         ]);
     }
 
     protected function error(string $message, int $code = 500, mixed $data = null): JsonResponse
     {
         return response()->json([
-            'code'    => $code,
+            'code' => $code,
             'message' => $message,
-            'data'    => $data,
+            'data' => $data,
         ]);
     }
 
     protected function paginate(LengthAwarePaginator $paginator, string $resourceClass): JsonResponse
     {
         return response()->json([
-            'code'    => 0,
+            'code' => 0,
             'message' => 'success',
-            'data'    => [
+            'data' => [
                 'items' => $resourceClass::collection($paginator->items()),
-                'meta'  => [
-                    'total'     => $paginator->total(),
-                    'page'      => $paginator->currentPage(),
-                    'per_page'  => $paginator->perPage(),
+                'meta' => [
+                    'total' => $paginator->total(),
+                    'page' => $paginator->currentPage(),
+                    'per_page' => $paginator->perPage(),
                     'last_page' => $paginator->lastPage(),
                 ],
             ],

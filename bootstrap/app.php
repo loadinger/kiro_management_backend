@@ -21,15 +21,15 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // 统一转换为信封格式
-        $envelope = fn(int $code, string $message, mixed $data = null): JsonResponse =>
-            response()->json(['code' => $code, 'message' => $message, 'data' => $data]);
+        $envelope = fn (int $code, string $message, mixed $data = null): JsonResponse => response()->json(['code' => $code, 'message' => $message, 'data' => $data]);
 
-        $exceptions->render(function (AuthenticationException $e) use ($envelope) {
+        $exceptions->render(function (AuthenticationException $e, \Illuminate\Http\Request $request) use ($envelope) {
             return $envelope(401, '未认证，请先登录');
         });
 
         $exceptions->render(function (ValidationException $e) use ($envelope) {
             $message = collect($e->errors())->flatten()->first() ?? '参数验证失败';
+
             return $envelope(422, $message);
         });
 

@@ -11,7 +11,7 @@
 ### System
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
-| S-01 | Auth：login / logout / refresh / me | 待开始 | 骨架已实现，待完善测试 |
+| S-01 | Auth：login / logout / refresh / me | 进行中 | Spec 已创建，待实现 users migration + seeder + 测试 |
 | S-02 | Global Search：`GET /api/search?q=` | 待开始 | 跨表搜索 movies / tv_shows / persons，每表 ≤ 10 条 |
 
 ### Movies
@@ -67,15 +67,38 @@
 ### 基础参考数据
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
-| R-01 | Reference Data：countries / departments / genres / jobs / keywords / languages 列表+搜索 | 待开始 | 同一 Spec 实现 |
-| R-02 | Production Companies：列表+搜索+详情 | 待开始 | 同一 Spec 实现 |
-| R-03 | TV Networks：列表+搜索+详情 | 待开始 | 同一 Spec 实现 |
+| R-01 | Reference Data：countries / departments / genres / jobs / keywords / languages 列表+搜索 | 已完成 | 同一 Spec 实现 |
+| R-02 | Production Companies：列表+搜索+详情 | 已完成 | 同一 Spec 实现 |
+| R-03 | TV Networks：列表+搜索+详情 | 已完成 | 同一 Spec 实现 |
 
 > R-01 / R-02 / R-03 合并在同一个 Spec：`.kiro/specs/reference-data/`
 
 ---
 
 ## 开发日志
+
+### 2026-03-28 — reference-data Spec 完成
+
+**完成内容：**
+- 实现 8 类只读参考数据 API（countries / departments / genres / jobs / keywords / languages / production_companies / tv_networks）
+- 标准分层架构：Model → Repository → Service → FormRequest → Resource → Controller → Route
+- 全部路由注册在 `auth:api` middleware 组内，仅 GET 方法
+- 富参考数据（production_companies / tv_networks）支持列表+详情，logo_url 通过 ImageHelper 拼接
+- 41 个测试全部通过，140 个断言
+
+**已注册路由：**
+- `GET /api/countries`
+- `GET /api/departments`
+- `GET /api/genres`
+- `GET /api/jobs`
+- `GET /api/keywords`
+- `GET /api/languages`
+- `GET /api/production-companies`
+- `GET /api/production-companies/{id}`
+- `GET /api/tv-networks`
+- `GET /api/tv-networks/{id}`
+
+---
 
 ### 2026-03-26 — 项目初始化
 
