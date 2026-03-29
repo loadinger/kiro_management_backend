@@ -20,7 +20,7 @@ class AuthController extends BaseController
             return $this->error('邮箱或密码错误', 401);
         }
 
-        return $this->success($this->tokenPayload($token));
+        return $this->success($this->tokenPayload($token, $guard->user()));
     }
 
     public function refresh(): JsonResponse
@@ -45,15 +45,21 @@ class AuthController extends BaseController
         return $this->success(new UserResource(auth('api')->user()));
     }
 
-    private function tokenPayload(string $token): array
+    private function tokenPayload(string $token, mixed $user = null): array
     {
         /** @var JWTGuard $guard */
         $guard = auth('api');
 
-        return [
+        $payload = [
             'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => $guard->factory()->getTTL() * 60,
+            'token_type'   => 'bearer',
+            'expires_in'   => $guard->factory()->getTTL() * 60,
         ];
+
+        if ($user !== null) {
+            $payload['user'] = ['id' => $user->id, 'name' => $user->name];
+        }
+
+        return $payload;
     }
 }
