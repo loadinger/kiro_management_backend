@@ -6,6 +6,7 @@ namespace App\Repositories;
 
 use App\Models\Department;
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class DepartmentRepository extends BaseRepository implements DepartmentRepositoryInterface
@@ -16,26 +17,38 @@ class DepartmentRepository extends BaseRepository implements DepartmentRepositor
     }
 
     /**
-     * Paginate departments with optional prefix search on name.
-     * Sort whitelist: id, name.
+     * Paginate departments with optional contains search on name.
+     * Sort whitelist: id.
      */
     public function paginateWithFilters(array $filters): LengthAwarePaginator
     {
         $query = Department::query();
 
         if (! empty($filters['q'])) {
-            $query->where('name', 'like', $filters['q'].'%');
+            $query->where('name', 'like', '%'.$filters['q'].'%');
         }
 
-        $allowedSorts = ['id', 'name'];
-        $sort = in_array($filters['sort'] ?? null, $allowedSorts, true) ? $filters['sort'] : 'id';
         $order = ($filters['order'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
-        $query->orderBy($sort, $order);
+        $query->orderBy('id', $order);
 
         return $query->paginate(
             perPage: (int) ($filters['per_page'] ?? 20),
             page: (int) ($filters['page'] ?? 1),
         );
+    }
+
+    /** Return all departments without pagination. Only suitable for small tables. */
+    public function getAll(array $filters): Collection
+    {
+        $query = Department::query();
+
+        if (! empty($filters['q'])) {
+            $query->where('name', 'like', '%'.$filters['q'].'%');
+        }
+
+        $order = ($filters['order'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy('id', $order)->get();
     }
 }

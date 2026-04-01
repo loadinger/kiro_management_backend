@@ -6,6 +6,7 @@ namespace App\Repositories;
 
 use App\Models\Job;
 use App\Repositories\Contracts\JobRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class JobRepository extends BaseRepository implements JobRepositoryInterface
@@ -17,21 +18,21 @@ class JobRepository extends BaseRepository implements JobRepositoryInterface
 
     /**
      * Paginate jobs with optional prefix search on name and exact match on department_id.
-     * Sort whitelist: id, name, department_id.
+     * Sort whitelist: id, department_id.
      */
     public function paginateWithFilters(array $filters): LengthAwarePaginator
     {
         $query = Job::query();
 
         if (! empty($filters['q'])) {
-            $query->where('name', 'like', $filters['q'].'%');
+            $query->where('name', 'like', '%'.$filters['q'].'%');
         }
 
         if (! empty($filters['department_id'])) {
             $query->where('department_id', (int) $filters['department_id']);
         }
 
-        $allowedSorts = ['id', 'name', 'department_id'];
+        $allowedSorts = ['id', 'department_id'];
         $sort = in_array($filters['sort'] ?? null, $allowedSorts, true) ? $filters['sort'] : 'id';
         $order = ($filters['order'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
@@ -41,5 +42,25 @@ class JobRepository extends BaseRepository implements JobRepositoryInterface
             perPage: (int) ($filters['per_page'] ?? 20),
             page: (int) ($filters['page'] ?? 1),
         );
+    }
+
+    /** Return all jobs without pagination. Only suitable for small tables. */
+    public function getAll(array $filters): Collection
+    {
+        $query = Job::query();
+
+        if (! empty($filters['q'])) {
+            $query->where('name', 'like', '%'.$filters['q'].'%');
+        }
+
+        if (! empty($filters['department_id'])) {
+            $query->where('department_id', (int) $filters['department_id']);
+        }
+
+        $allowedSorts = ['id', 'department_id'];
+        $sort = in_array($filters['sort'] ?? null, $allowedSorts, true) ? $filters['sort'] : 'id';
+        $order = ($filters['order'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy($sort, $order)->get();
     }
 }

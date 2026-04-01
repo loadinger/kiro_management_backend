@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -34,8 +35,8 @@ class BaseController extends Controller
             'code' => 0,
             'message' => 'success',
             'data' => [
-                'items' => $resourceClass::collection($paginator->items()),
-                'meta' => [
+                'list' => $resourceClass::collection($paginator->items()),
+                'pagination' => [
                     'total' => $paginator->total(),
                     'page' => $paginator->currentPage(),
                     'per_page' => $paginator->perPage(),
@@ -43,5 +44,14 @@ class BaseController extends Controller
                 ],
             ],
         ]);
+    }
+
+    /**
+     * Return a flat array response for small tables that don't require pagination.
+     * Use for /xxx/all style endpoints only.
+     */
+    protected function listing(Collection $collection, string $resourceClass): JsonResponse
+    {
+        return $this->success($resourceClass::collection($collection));
     }
 }

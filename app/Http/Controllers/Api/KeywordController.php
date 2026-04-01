@@ -22,4 +22,12 @@ class KeywordController extends BaseController
             KeywordResource::class
         );
     }
+
+    public function all(ListKeywordRequest $request): JsonResponse
+    {
+        return $this->listing(
+            $this->keywordService->getAll($request->validated()),
+            KeywordResource::class
+        );
+    }
 }

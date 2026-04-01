@@ -6,6 +6,7 @@ namespace App\Repositories;
 
 use App\Models\Language;
 use App\Repositories\Contracts\LanguageRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class LanguageRepository extends BaseRepository implements LanguageRepositoryInterface
@@ -17,7 +18,7 @@ class LanguageRepository extends BaseRepository implements LanguageRepositoryInt
 
     /**
      * Paginate languages with optional prefix search on english_name or name.
-     * Sort whitelist: id, english_name.
+     * Sort whitelist: id, english_name, iso_639_1.
      */
     public function paginateWithFilters(array $filters): LengthAwarePaginator
     {
@@ -26,12 +27,12 @@ class LanguageRepository extends BaseRepository implements LanguageRepositoryInt
         if (! empty($filters['q'])) {
             $q = $filters['q'];
             $query->where(function ($sub) use ($q) {
-                $sub->where('english_name', 'like', $q.'%')
-                    ->orWhere('name', 'like', $q.'%');
+                $sub->where('english_name', 'like', '%'.$q.'%')
+                    ->orWhere('name', 'like', '%'.$q.'%');
             });
         }
 
-        $allowedSorts = ['id', 'english_name'];
+        $allowedSorts = ['id', 'english_name', 'iso_639_1'];
         $sort = in_array($filters['sort'] ?? null, $allowedSorts, true) ? $filters['sort'] : 'id';
         $order = ($filters['order'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
@@ -41,5 +42,25 @@ class LanguageRepository extends BaseRepository implements LanguageRepositoryInt
             perPage: (int) ($filters['per_page'] ?? 20),
             page: (int) ($filters['page'] ?? 1),
         );
+    }
+
+    /** Return all languages without pagination. Only suitable for small tables. */
+    public function getAll(array $filters): Collection
+    {
+        $query = Language::query();
+
+        if (! empty($filters['q'])) {
+            $q = $filters['q'];
+            $query->where(function ($sub) use ($q) {
+                $sub->where('english_name', 'like', '%'.$q.'%')
+                    ->orWhere('name', 'like', '%'.$q.'%');
+            });
+        }
+
+        $allowedSorts = ['id', 'english_name', 'iso_639_1'];
+        $sort = in_array($filters['sort'] ?? null, $allowedSorts, true) ? $filters['sort'] : 'id';
+        $order = ($filters['order'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy($sort, $order)->get();
     }
 }

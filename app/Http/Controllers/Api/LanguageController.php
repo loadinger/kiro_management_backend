@@ -22,4 +22,12 @@ class LanguageController extends BaseController
             LanguageResource::class
         );
     }
+
+    public function all(ListLanguageRequest $request): JsonResponse
+    {
+        return $this->listing(
+            $this->languageService->getAll($request->validated()),
+            LanguageResource::class
+        );
+    }
 }

@@ -17,7 +17,7 @@ class TvNetworkRepository extends BaseRepository implements TvNetworkRepositoryI
 
     /**
      * Paginate TV networks with optional prefix search on name.
-     * Sort whitelist: id, name.
+     * Sort whitelist: id.
      */
     public function paginateWithFilters(array $filters): LengthAwarePaginator
     {
@@ -25,14 +25,12 @@ class TvNetworkRepository extends BaseRepository implements TvNetworkRepositoryI
 
         if (! empty($filters['q'])) {
             $q = $filters['q'];
-            $query->where('name', 'like', $q.'%');
+            $query->where('name', 'like', '%'.$q.'%');
         }
 
-        $allowedSorts = ['id', 'name'];
-        $sort = in_array($filters['sort'] ?? null, $allowedSorts, true) ? $filters['sort'] : 'id';
         $order = ($filters['order'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
-        $query->orderBy($sort, $order);
+        $query->orderBy('id', $order);
 
         return $query->paginate(
             perPage: (int) ($filters['per_page'] ?? 20),

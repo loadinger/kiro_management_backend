@@ -22,4 +22,12 @@ class GenreController extends BaseController
             GenreResource::class
         );
     }
+
+    public function all(ListGenreRequest $request): JsonResponse
+    {
+        return $this->listing(
+            $this->genreService->getAll($request->validated()),
+            GenreResource::class
+        );
+    }
 }

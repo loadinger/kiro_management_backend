@@ -22,4 +22,12 @@ class JobController extends BaseController
             JobResource::class
         );
     }
+
+    public function all(ListJobRequest $request): JsonResponse
+    {
+        return $this->listing(
+            $this->jobService->getAll($request->validated()),
+            JobResource::class
+        );
+    }
 }

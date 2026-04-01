@@ -21,8 +21,8 @@
   "code": 0,
   "message": "success",
   "data": {
-    "items": [...],
-    "meta": {
+    "list": [...],
+    "pagination": {
       "total": 1000000,
       "page": 1,
       "per_page": 20,
@@ -31,6 +31,25 @@
   }
 }
 ```
+
+### 全量列表响应（不分页）
+
+适用于数据量小、前端需要一次性获取全部数据的场景（如 genres、languages、countries 等参考数据）。
+
+路由约定：`GET /api/{resources}/all`
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": [...]
+}
+```
+
+- `data` 直接为数组，不包含 `list` 或 `pagination` 节点
+- 仅限小表使用，禁止对 movies、persons 等大表提供 `/all` 接口
+- Controller 调用 `BaseController::listing()`，Service 调用 `getAll()`，Repository 实现 `getAll(): Collection`
+- 路由注册时 `/all` 必须放在 `/{id}` 之前，防止被当作详情路由匹配
 
 ### 错误响应
 
@@ -70,8 +89,8 @@
 
 ```json
 "data": {
-  "items": [...],
-  "meta": {
+  "list": [...],
+  "pagination": {
     "total": 1000000,
     "page": 1,
     "per_page": 20,

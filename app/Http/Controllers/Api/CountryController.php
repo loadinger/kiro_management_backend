@@ -22,4 +22,12 @@ class CountryController extends BaseController
             CountryResource::class
         );
     }
+
+    public function all(ListCountryRequest $request): JsonResponse
+    {
+        return $this->listing(
+            $this->countryService->getAll($request->validated()),
+            CountryResource::class
+        );
+    }
 }

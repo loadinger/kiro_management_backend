@@ -22,9 +22,10 @@ Route::prefix('auth')->group(function () {
     Route::middleware('throttle:10,1')->group(function () {
         Route::post('login', [AuthController::class, 'login']);
     });
+    // refresh 不走 auth:api，允许携带已过期 token 来换新 token
+    Route::post('refresh', [AuthController::class, 'refresh']);
     Route::middleware('auth:api')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
-        Route::post('refresh', [AuthController::class, 'refresh']);
         Route::get('me', [AuthController::class, 'me']);
     });
 });
@@ -32,11 +33,17 @@ Route::prefix('auth')->group(function () {
 // 受保护路由（所有业务接口放这里）
 Route::middleware('auth:api')->group(function () {
     // 轻量参考数据（仅列表）
+    Route::get('countries/all', [CountryController::class, 'all']);
     Route::get('countries', [CountryController::class, 'index']);
+    Route::get('departments/all', [DepartmentController::class, 'all']);
     Route::get('departments', [DepartmentController::class, 'index']);
+    Route::get('genres/all', [GenreController::class, 'all']);
     Route::get('genres', [GenreController::class, 'index']);
+    Route::get('jobs/all', [JobController::class, 'all']);
     Route::get('jobs', [JobController::class, 'index']);
+    Route::get('keywords/all', [KeywordController::class, 'all']);
     Route::get('keywords', [KeywordController::class, 'index']);
+    Route::get('languages/all', [LanguageController::class, 'all']);
     Route::get('languages', [LanguageController::class, 'index']);
 
     // 富参考数据（列表 + 详情）

@@ -22,4 +22,12 @@ class DepartmentController extends BaseController
             DepartmentResource::class
         );
     }
+
+    public function all(ListDepartmentRequest $request): JsonResponse
+    {
+        return $this->listing(
+            $this->departmentService->getAll($request->validated()),
+            DepartmentResource::class
+        );
+    }
 }

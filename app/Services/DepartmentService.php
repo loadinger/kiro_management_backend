@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class DepartmentService
@@ -16,5 +17,10 @@ class DepartmentService
     public function getList(array $filters): LengthAwarePaginator
     {
         return $this->repository->paginateWithFilters($filters);
+    }
+
+    public function getAll(array $filters): Collection
+    {
+        return $this->repository->getAll($filters);
     }
 }
