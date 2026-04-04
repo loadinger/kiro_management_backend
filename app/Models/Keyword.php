@@ -10,5 +10,12 @@ class Keyword extends Model
 {
     protected $table = 'keywords';
 
-    protected $fillable = [];
+    protected $fillable = [
+        'name_zh',
+        'translated_at',
+    ];
+
+    protected $casts = [
+        'translated_at' => 'datetime',
+    ];
 }

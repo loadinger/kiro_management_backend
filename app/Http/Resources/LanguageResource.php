@@ -16,6 +16,7 @@ class LanguageResource extends JsonResource
             'iso_639_1' => $this->iso_639_1,
             'english_name' => $this->english_name,
             'name' => $this->name,
+            'name_zh' => $this->name_zh,
         ];
     }
 }

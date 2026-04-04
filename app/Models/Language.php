@@ -10,5 +10,12 @@ class Language extends Model
 {
     protected $table = 'languages';
 
-    protected $fillable = [];
+    protected $fillable = [
+        'name_zh',
+        'translated_at',
+    ];
+
+    protected $casts = [
+        'translated_at' => 'datetime',
+    ];
 }

@@ -15,6 +15,7 @@ class KeywordResource extends JsonResource
             'id' => $this->id,
             'tmdb_id' => $this->tmdb_id,
             'name' => $this->name,
+            'name_zh' => $this->name_zh,
         ];
     }
 }

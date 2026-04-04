@@ -66,8 +66,6 @@ routes/
 | `development-workflow.md` | 环境启动、新增模块流程、目录速查 |
 | `testing-strategy.md` | 测试分层、mock 策略、覆盖要求 |
 | `security.md` | 认证、输入安全、CORS、敏感信息保护 |
-| `llm-translation.md` | LLM 翻译模块详细规范（待创建） |
-| `dashboard.md` | Dashboard 数据统计模块规范（待创建） |
 
 ## 数据库读写边界
 

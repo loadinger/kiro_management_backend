@@ -11,7 +11,14 @@ class Department extends Model
 {
     protected $table = 'departments';
 
-    protected $fillable = [];
+    protected $fillable = [
+        'name_zh',
+        'translated_at',
+    ];
+
+    protected $casts = [
+        'translated_at' => 'datetime',
+    ];
 
     public function jobs(): HasMany
     {

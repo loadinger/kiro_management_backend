@@ -11,7 +11,14 @@ class Job extends Model
 {
     protected $table = 'jobs';
 
-    protected $fillable = [];
+    protected $fillable = [
+        'name_zh',
+        'translated_at',
+    ];
+
+    protected $casts = [
+        'translated_at' => 'datetime',
+    ];
 
     public function department(): BelongsTo
     {
