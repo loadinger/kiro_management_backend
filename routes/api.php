@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CountryController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\GenreController;
 use App\Http\Controllers\Api\JobController;
@@ -51,6 +52,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('production-companies/{id}', [ProductionCompanyController::class, 'show']);
     Route::get('tv-networks', [TvNetworkController::class, 'index']);
     Route::get('tv-networks/{id}', [TvNetworkController::class, 'show']);
+
+    // Dashboard 统计接口
+    Route::get('dashboard/stats', [DashboardController::class, 'stats']);
+    Route::get('dashboard/trends', [DashboardController::class, 'trends']);
 
     // movies, tv-shows, persons 等接口后续在此添加
 });

@@ -11,8 +11,10 @@ use App\Repositories\Contracts\JobRepositoryInterface;
 use App\Repositories\Contracts\KeywordRepositoryInterface;
 use App\Repositories\Contracts\LanguageRepositoryInterface;
 use App\Repositories\Contracts\ProductionCompanyRepositoryInterface;
+use App\Repositories\Contracts\DashboardRepositoryInterface;
 use App\Repositories\Contracts\TvNetworkRepositoryInterface;
 use App\Repositories\CountryRepository;
+use App\Repositories\DashboardRepository;
 use App\Repositories\DepartmentRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\JobRepository;
@@ -37,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(LanguageRepositoryInterface::class, LanguageRepository::class);
         $this->app->bind(ProductionCompanyRepositoryInterface::class, ProductionCompanyRepository::class);
         $this->app->bind(TvNetworkRepositoryInterface::class, TvNetworkRepository::class);
+        $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
     }
 
     /**

@@ -66,13 +66,121 @@ routes/
 | `development-workflow.md` | 环境启动、新增模块流程、目录速查 |
 | `testing-strategy.md` | 测试分层、mock 策略、覆盖要求 |
 | `security.md` | 认证、输入安全、CORS、敏感信息保护 |
+| `llm-translation.md` | LLM 翻译模块详细规范（待创建） |
+| `dashboard.md` | Dashboard 数据统计模块规范（待创建） |
 
 ## 数据库读写边界
 
 - 只读：movies / tv_shows / persons 等所有 TMDB 采集数据表
 - 可写：users（管理员账号）、专题文章（待规划）
+- 扩展写入：departments / jobs / keywords / languages 的 `name_zh` / `translated_at` 字段（由翻译任务写入，见下方）
 
 详见 `.kiro/steering/data-flow.md`。
+
+---
+
+## LLM 翻译模块
+
+### 背景
+
+数据库中 departments、jobs、keywords、languages 等参考数据表的 `name` 字段均为英文（来自 TMDB），需要翻译为中文供前端展示。
+
+### 技术方案
+
+- LLM 环境：本地部署 Ollama + Qwen 2.5 7B，兼容 OpenAI Chat Completions 格式
+- 翻译结果存储：各表新增 `name_zh`（nullable varchar）和 `translated_at`（nullable timestamp）字段
+- `translated_at` 为 null 表示未翻译，非 null 为上次翻译时间
+- 原始 `name` 字段保持不变，API 输出时 `name_zh` 为 null 时降级返回 `name`
+
+### 涉及表与字段
+
+| 表 | 新增字段 | 备注 |
+|----|---------|------|
+| `departments` | `name_zh`, `translated_at` | |
+| `jobs` | `name_zh`, `translated_at` | 翻译时带 department.name 作为上下文 |
+| `keywords` | `name_zh`, `translated_at` | 数据量大，支持断点续传 |
+| `languages` | `name_zh`, `translated_at` | |
+
+### 架构分层
+
+```
+Artisan Command (translate:names)
+  └── TranslationService（按表分发，构建上下文）
+        └── LlmTranslationService（封装 Ollama 调用）
+              └── Ollama /api/chat（format: "json"）
+```
+
+### Prompt 设计原则
+
+**System Prompt 核心约束：**
+1. 领域锚定：明确告知模型这是 TMDB 影视行业术语
+2. 简洁约束：译文必须是词或短语，不能是句子
+   - `keywords` / `departments` / `languages`：≤ 8 个汉字
+   - `jobs`：≤ 12 个汉字
+3. 正反例示范（对小模型效果显著）：
+   - ❌ "based on novel" → "这是一部基于小说改编的作品"
+   - ✓ "based on novel" → "小说改编"
+4. `jobs` 表额外带部门名上下文，提升职位翻译准确性
+
+**批量翻译结构（用 id 映射，不依赖顺序）：**
+```json
+// 输入
+{"task": "translate_to_chinese", "context": "电影制作职位，所属部门：Camera", "items": [{"id": 1, "text": "Director of Photography"}]}
+// 期望输出
+[{"id": 1, "translation": "摄影指导"}]
+```
+
+### JSON 格式容错策略
+
+小模型输出格式不稳定，采用多层防御：
+
+1. Ollama `format: "json"` 参数强制 JSON 输出
+2. 正则从响应中提取 `[...]` 或 `{...}` 块，处理 markdown 代码块等污染
+3. 解析失败自动重试，最多 3 次，批量大小递减（20 → 5 → 1）
+4. 全部重试失败则跳过该批次，不写入 `translated_at`，下次运行重新处理
+
+### Artisan Command
+
+```bash
+php artisan translate:names --table=keywords --batch-size=20
+php artisan translate:names --table=all
+php artisan translate:names --table=keywords --limit=100  # 小批验证质量
+```
+
+- `keywords` 支持断点续传（`WHERE name_zh IS NULL`），其余表数据量小无需
+- 显示进度条，输出成功/失败/跳过统计
+
+---
+
+## Dashboard 数据统计模块（已实现）
+
+接口均需 `auth:api` 认证，结果走 Redis 缓存。
+
+| 接口 | 缓存 TTL | 说明 |
+|------|---------|------|
+| `GET /api/dashboard/stats` | 10 分钟 | 聚合统计，各子项独立查询，单项失败返回 null 不影响其他项 |
+| `GET /api/dashboard/trends` | 5 分钟 | 实体每日新增趋势，缓存 key 含 days + entities |
+
+### stats 返回字段
+
+| 字段 | 说明 |
+|------|------|
+| `entity_counts` | 各主要实体总记录数 |
+| `reconcile_rates` | 异步关联表 reconcile 完成率（total / resolved / rate） |
+| `translation_coverage` | 各表中文翻译覆盖率（total / translated / rate） |
+| `data_freshness` | 各表最后更新时间（last_updated_at / is_stale，超 48 小时标记为 stale） |
+| `snapshot_health` | 最近 30 天快照健康状况（checked_days / healthy_days / missing_dates） |
+
+### trends 请求参数
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `days` | int | 查询天数 |
+| `entities` | array | 实体名称列表 |
+
+trends 返回：`dates`（日期序列，升序）+ `series`（各实体每日新增数量，缺失日期填 0）
+
+---
 
 ## 语言约定
 

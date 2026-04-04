@@ -13,6 +13,8 @@
 |---|------|------|------|
 | S-01 | Auth：login / logout / refresh / me | 进行中 | Spec 已创建，待实现 users migration + seeder + 测试 |
 | S-02 | Global Search：`GET /api/search?q=` | 待开始 | 跨表搜索 movies / tv_shows / persons，每表 ≤ 10 条 |
+| S-03 | LLM 翻译：`php artisan translate:names` | 待开始 | 对 departments / jobs / keywords / languages 的 name 字段做中文翻译，写入 name_zh |
+| S-04 | Dashboard 数据统计：`GET /api/dashboard/stats` + `GET /api/dashboard/trends` | 已完成 | 各实体总量、近期新增趋势折线图、异步关联完成率、翻译覆盖率、数据新鲜度、每日采集健康度 |
 
 ### Movies
 | # | 接口 | 状态 | 备注 |
@@ -122,6 +124,21 @@
 
 ---
 
+### 2026-04-04 — dashboard Spec 完成
+
+**完成内容：**
+- 实现 Dashboard 数据统计模块，提供两个只读聚合接口
+- 标准分层架构：DashboardRepositoryInterface → DashboardRepository → DashboardService → GetTrendsRequest → DashboardController → Route
+- Redis 缓存：stats TTL 10 分钟，trends TTL 5 分钟，缓存键含参数签名
+- 子项容错：每个统计子项独立 try-catch，失败时返回 null 不影响其他子项
+- 29 个测试全部通过，15,517 个断言
+
+**已注册路由：**
+- `GET /api/dashboard/stats`
+- `GET /api/dashboard/trends?days=30&entities=movies,tv_shows,persons`
+
+---
+
 ## 决策记录
 
 ### ADR-001 — 技术栈选型（2026-03-26）
@@ -213,6 +230,24 @@ GET /api/tv-episodes?tv_season_id=789
 ```
 
 **原因：** 管理后台搜索频率低，用户通常知道目标类型。方案实现简单，性能可控。后续如有复杂搜索需求再引入 MeiliSearch。
+
+---
+
+### ADR-008 — LLM 翻译方案（2026-04-02）
+
+**决策：** 使用本地 Ollama + Qwen 2.5 7B 对参考数据表的英文 name 字段做中文翻译
+
+**背景：** departments / jobs / keywords / languages 的 name 字段均为英文，前端展示需要中文。
+
+**关键决策点：**
+- 新增 `name_zh` + `translated_at` 字段，不修改原始 `name`，API 层降级兜底
+- 使用 Ollama `format: "json"` 参数强制 JSON 输出，配合多层容错重试（最多 3 次，批量递减）
+- 批量翻译用 `id` 字段做映射，不依赖顺序，防止漏翻导致错位
+- `jobs` 翻译时携带 `department.name` 作为上下文
+- `keywords` 数据量大，支持断点续传（`WHERE name_zh IS NULL`）
+- Prompt 明确约束译文长度：keywords/departments/languages ≤ 8 字，jobs ≤ 12 字，并提供正反例
+
+**结论：** Artisan Command 驱动，TranslationService + LlmTranslationService 分层，不影响现有 API 逻辑。
 
 ---
 
