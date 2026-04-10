@@ -69,7 +69,7 @@ class TvNetworkTest extends TestCase
 
     public function test_show_returns_network(): void
     {
-        $network = (new TvNetwork())->forceFill(['id' => 1, 'tmdb_id' => 213, 'name' => 'Netflix']);
+        $network = (new TvNetwork)->forceFill(['id' => 1, 'tmdb_id' => 213, 'name' => 'Netflix']);
 
         $this->mock(TvNetworkService::class, function (MockInterface $mock) use ($network) {
             $mock->shouldReceive('findById')

@@ -114,7 +114,7 @@ PROMPT;
 
         Log::debug('Ollama raw response', [
             'status' => $response->status(),
-            'body'   => mb_substr($response->body(), 0, 1000),
+            'body' => mb_substr($response->body(), 0, 1000),
         ]);
 
         $extracted = $this->extractJsonBlock((string) $raw);
@@ -253,7 +253,7 @@ PROMPT;
             }
 
             $results[] = [
-                'id'          => (int) $id,
+                'id' => (int) $id,
                 'translation' => $translation,
             ];
         }

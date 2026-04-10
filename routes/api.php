@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CollectionController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DepartmentController;
@@ -8,8 +9,26 @@ use App\Http\Controllers\Api\GenreController;
 use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\Api\KeywordController;
 use App\Http\Controllers\Api\LanguageController;
+use App\Http\Controllers\Api\MovieController;
+use App\Http\Controllers\Api\MovieCreditController;
+use App\Http\Controllers\Api\MovieGenreController;
+use App\Http\Controllers\Api\MovieImageController;
+use App\Http\Controllers\Api\MovieKeywordController;
+use App\Http\Controllers\Api\MovieProductionCompanyController;
 use App\Http\Controllers\Api\ProductionCompanyController;
+use App\Http\Controllers\Api\TvEpisodeController;
+use App\Http\Controllers\Api\TvEpisodeCreditController;
+use App\Http\Controllers\Api\TvEpisodeImageController;
 use App\Http\Controllers\Api\TvNetworkController;
+use App\Http\Controllers\Api\TvSeasonController;
+use App\Http\Controllers\Api\TvSeasonImageController;
+use App\Http\Controllers\Api\TvShowController;
+use App\Http\Controllers\Api\TvShowCreatorController;
+use App\Http\Controllers\Api\TvShowGenreController;
+use App\Http\Controllers\Api\TvShowImageController;
+use App\Http\Controllers\Api\TvShowKeywordController;
+use App\Http\Controllers\Api\TvShowNetworkController;
+use App\Http\Controllers\Api\TvShowProductionCompanyController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,5 +76,45 @@ Route::middleware('auth:api')->group(function () {
     Route::get('dashboard/stats', [DashboardController::class, 'stats']);
     Route::get('dashboard/trends', [DashboardController::class, 'trends']);
 
-    // movies, tv-shows, persons 等接口后续在此添加
+    // 合集
+    Route::get('collections', [CollectionController::class, 'index']);
+    Route::get('collections/{id}', [CollectionController::class, 'show']);
+
+    // 电影主资源
+    Route::get('movies', [MovieController::class, 'index']);
+    Route::get('movies/{id}', [MovieController::class, 'show']);
+
+    // 电影子资源
+    Route::get('movie-credits', [MovieCreditController::class, 'index']);
+    Route::get('movie-images', [MovieImageController::class, 'index']);
+    Route::get('movie-genres', [MovieGenreController::class, 'index']);
+    Route::get('movie-keywords', [MovieKeywordController::class, 'index']);
+    Route::get('movie-production-companies', [MovieProductionCompanyController::class, 'index']);
+
+    // 电视剧主资源
+    Route::get('tv-shows', [TvShowController::class, 'index']);
+    Route::get('tv-shows/{id}', [TvShowController::class, 'show']);
+
+    // 电视剧子资源（全量，不分页）
+    Route::get('tv-show-genres', [TvShowGenreController::class, 'index']);
+    Route::get('tv-show-keywords', [TvShowKeywordController::class, 'index']);
+    Route::get('tv-show-networks', [TvShowNetworkController::class, 'index']);
+    Route::get('tv-show-production-companies', [TvShowProductionCompanyController::class, 'index']);
+    Route::get('tv-show-creators', [TvShowCreatorController::class, 'index']);
+
+    // 电视剧子资源（分页）
+    Route::get('tv-show-images', [TvShowImageController::class, 'index']);
+
+    // 电视剧季
+    Route::get('tv-seasons', [TvSeasonController::class, 'index']);
+    Route::get('tv-seasons/{id}', [TvSeasonController::class, 'show']);
+    Route::get('tv-season-images', [TvSeasonImageController::class, 'index']);
+
+    // 电视剧集
+    Route::get('tv-episodes', [TvEpisodeController::class, 'index']);
+    Route::get('tv-episodes/{id}', [TvEpisodeController::class, 'show']);
+    Route::get('tv-episode-credits', [TvEpisodeCreditController::class, 'index']);
+    Route::get('tv-episode-images', [TvEpisodeImageController::class, 'index']);
+
+    // persons 等接口后续在此添加
 });

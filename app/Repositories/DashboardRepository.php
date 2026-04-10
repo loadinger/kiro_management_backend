@@ -64,19 +64,19 @@ class DashboardRepository implements DashboardRepositoryInterface
     {
         // Tables keyed by table name => foreign key column used to determine "resolved"
         $tables = [
-            'movie_credits'      => 'person_id',
-            'tv_show_creators'   => 'person_id',
+            'movie_credits' => 'person_id',
+            'tv_show_creators' => 'person_id',
             'tv_episode_credits' => 'person_id',
-            'collection_movies'  => 'movie_id',
+            'collection_movies' => 'movie_id',
         ];
 
         $result = [];
         foreach ($tables as $table => $fkColumn) {
-            $total    = (int) DB::table($table)->count();
+            $total = (int) DB::table($table)->count();
             $resolved = (int) DB::table($table)->whereNotNull($fkColumn)->count();
 
             $result[$table] = [
-                'total'    => $total,
+                'total' => $total,
                 'resolved' => $resolved,
             ];
         }
@@ -102,11 +102,11 @@ class DashboardRepository implements DashboardRepositoryInterface
 
         $result = [];
         foreach ($tables as $table) {
-            $total      = (int) DB::table($table)->count();
+            $total = (int) DB::table($table)->count();
             $translated = (int) DB::table($table)->whereNotNull('translated_at')->count();
 
             $result[$table] = [
-                'total'      => $total,
+                'total' => $total,
                 'translated' => $translated,
             ];
         }
@@ -147,8 +147,8 @@ class DashboardRepository implements DashboardRepositoryInterface
      *
      * Uses the (list_type, snapshot_date, rank) index to avoid full table scans.
      *
-     * @param  int    $days  Number of days to look back (e.g. 30)
-     * @return array<int, string>  Array of date strings in 'Y-m-d' format
+     * @param  int  $days  Number of days to look back (e.g. 30)
+     * @return array<int, string> Array of date strings in 'Y-m-d' format
      */
     public function getSnapshotDates(int $days): array
     {
@@ -168,10 +168,10 @@ class DashboardRepository implements DashboardRepositoryInterface
      * For the 'persons' table a WHERE created_at >= NOW() - INTERVAL $days DAY
      * condition is always applied to leverage the created_at index.
      *
-     * @param  int           $days      Number of days to look back
-     * @param  array<string> $entities  Entity names to query, e.g. ['movies', 'tv_shows', 'persons']
+     * @param  int  $days  Number of days to look back
+     * @param  array<string>  $entities  Entity names to query, e.g. ['movies', 'tv_shows', 'persons']
      * @return array<string, array<int, array{date: string, count: int}>>
-     *         Keyed by entity name; each value is an array of ['date' => 'Y-m-d', 'count' => int] rows
+     *                                                                    Keyed by entity name; each value is an array of ['date' => 'Y-m-d', 'count' => int] rows
      */
     public function getTrendRows(int $days, array $entities): array
     {
@@ -191,7 +191,7 @@ class DashboardRepository implements DashboardRepositoryInterface
             $rows = $query->get();
 
             $result[$entity] = $rows->map(fn ($row) => [
-                'date'  => (string) $row->date,
+                'date' => (string) $row->date,
                 'count' => (int) $row->count,
             ])->values()->all();
         }

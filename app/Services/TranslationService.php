@@ -65,7 +65,7 @@ class TranslationService
             // Skip records where the source field is empty
             $items = $records
                 ->map(fn ($record) => [
-                    'id'   => $record->id,
+                    'id' => $record->id,
                     'text' => $table === 'languages' ? $record->english_name : $record->name,
                 ])
                 ->filter(fn ($item) => ! empty($item['text']))
@@ -89,6 +89,7 @@ class TranslationService
                 if ($onProgress !== null) {
                     ($onProgress)($processed, $total);
                 }
+
                 continue;
             }
 
@@ -134,10 +135,10 @@ class TranslationService
     private function countRecords(string $table, ?int $limit): int
     {
         $query = match ($table) {
-            'keywords'    => Keyword::query()->whereNull('translated_at'),
+            'keywords' => Keyword::query()->whereNull('translated_at'),
             'departments' => Department::query()->whereNull('translated_at'),
-            'jobs'        => Job::query()->whereNull('translated_at'),
-            'languages'   => Language::query()->whereNull('translated_at'),
+            'jobs' => Job::query()->whereNull('translated_at'),
+            'languages' => Language::query()->whereNull('translated_at'),
             default => throw new \InvalidArgumentException("Unsupported table: {$table}"),
         };
 

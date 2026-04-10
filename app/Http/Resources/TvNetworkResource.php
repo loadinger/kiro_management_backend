@@ -18,7 +18,7 @@ class TvNetworkResource extends JsonResource
             'name' => $this->name,
             'headquarters' => $this->headquarters,
             'homepage' => $this->homepage,
-            'logo_url' => ImageHelper::url($this->logo_path, 'w342'),
+            'logo_path' => ImageHelper::url($this->logo_path, 'w342'),
             'origin_country' => $this->origin_country,
         ];
     }

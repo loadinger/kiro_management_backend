@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\ReferenceData;
 
+use App\Exceptions\AppException;
 use App\Models\ProductionCompany;
 use App\Models\User;
 use App\Services\ProductionCompanyService;
@@ -88,7 +89,7 @@ class ProductionCompanyControllerTest extends TestCase
         $token = auth('api')->login($user);
 
         $longQ = str_repeat('a', 101);
-        $response = $this->withToken($token)->getJson('/api/production-companies?q=' . $longQ);
+        $response = $this->withToken($token)->getJson('/api/production-companies?q='.$longQ);
 
         $response->assertStatus(200)
             ->assertJson(['code' => 422, 'data' => null]);
@@ -115,7 +116,7 @@ class ProductionCompanyControllerTest extends TestCase
             $mock->shouldReceive('findById')
                 ->once()
                 ->with(9999)
-                ->andThrow(new \App\Exceptions\AppException('制作公司不存在', 404));
+                ->andThrow(new AppException('制作公司不存在', 404));
         });
 
         $user = User::factory()->create();
@@ -131,7 +132,7 @@ class ProductionCompanyControllerTest extends TestCase
     // Validates: Requirements 10.4, 10.6
     public function test_show_returns_full_detail_fields(): void
     {
-        $company = (new ProductionCompany())->forceFill([
+        $company = (new ProductionCompany)->forceFill([
             'id' => 1,
             'tmdb_id' => 420,
             'name' => 'Marvel Studios',
@@ -158,18 +159,18 @@ class ProductionCompanyControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson(['code' => 0])
             ->assertJsonStructure([
-                'data' => ['id', 'tmdb_id', 'name', 'description', 'headquarters', 'homepage', 'logo_url', 'origin_country', 'parent_company_tmdb_id'],
+                'data' => ['id', 'tmdb_id', 'name', 'description', 'headquarters', 'homepage', 'logo_path', 'origin_country', 'parent_company_tmdb_id'],
             ]);
 
-        $logoUrl = $response->json('data.logo_url');
+        $logoUrl = $response->json('data.logo_path');
         $this->assertStringContainsString('w342', $logoUrl);
     }
 
-    // Feature: reference-data, Property 13: logo_path null returns logo_url null
+    // Feature: reference-data, Property 13: logo_path null returns logo_path null
     // Validates: Requirements 10.7
     public function test_logo_url_is_null_when_logo_path_is_null(): void
     {
-        $company = (new ProductionCompany())->forceFill([
+        $company = (new ProductionCompany)->forceFill([
             'id' => 2,
             'tmdb_id' => 421,
             'name' => 'No Logo Studio',
@@ -195,6 +196,6 @@ class ProductionCompanyControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(['code' => 0])
-            ->assertJson(['data' => ['logo_url' => null]]);
+            ->assertJson(['data' => ['logo_path' => null]]);
     }
 }

@@ -48,7 +48,7 @@ class DashboardServiceTest extends TestCase
         Log::shouldReceive('error')->zeroOrMoreTimes();
 
         $service = new DashboardService($repo);
-        $stats   = $service->getStats();
+        $stats = $service->getStats();
 
         $this->assertNull($stats['data_freshness']['movies']['last_updated_at']);
         $this->assertTrue($stats['data_freshness']['movies']['is_stale']);
@@ -82,7 +82,7 @@ class DashboardServiceTest extends TestCase
         Log::shouldReceive('error')->zeroOrMoreTimes();
 
         $service = new DashboardService($repo);
-        $stats   = $service->getStats();
+        $stats = $service->getStats();
 
         $this->assertFalse(
             $stats['data_freshness']['movies']['is_stale'],
@@ -114,7 +114,7 @@ class DashboardServiceTest extends TestCase
         Log::shouldReceive('error')->zeroOrMoreTimes();
 
         $service = new DashboardService($repo);
-        $stats   = $service->getStats();
+        $stats = $service->getStats();
 
         $this->assertTrue(
             $stats['data_freshness']['movies']['is_stale'],
@@ -146,7 +146,7 @@ class DashboardServiceTest extends TestCase
         Log::shouldReceive('error')->zeroOrMoreTimes();
 
         $service = new DashboardService($repo);
-        $stats   = $service->getStats();
+        $stats = $service->getStats();
 
         $snapshotHealth = $stats['snapshot_health'];
 
@@ -185,7 +185,7 @@ class DashboardServiceTest extends TestCase
         Log::shouldReceive('error')->zeroOrMoreTimes();
 
         $service = new DashboardService($repo);
-        $stats   = $service->getStats();
+        $stats = $service->getStats();
 
         $snapshotHealth = $stats['snapshot_health'];
 
@@ -208,7 +208,7 @@ class DashboardServiceTest extends TestCase
         Cache::flush();
 
         // Use a 3-day window for simplicity
-        $days     = 3;
+        $days = 3;
         $entities = ['movies'];
 
         $date0 = Carbon::today()->subDays(2)->format('Y-m-d'); // oldest
@@ -227,7 +227,7 @@ class DashboardServiceTest extends TestCase
         Log::shouldReceive('error')->zeroOrMoreTimes();
 
         $service = new DashboardService($repo);
-        $result  = $service->getTrends($days, $entities);
+        $result = $service->getTrends($days, $entities);
 
         $this->assertSame([$date0, $date1, $date2], $result['dates']);
         $this->assertSame([10, 0, 25], $result['series']['movies']);
@@ -260,7 +260,7 @@ class DashboardServiceTest extends TestCase
         Log::shouldReceive('error')->zeroOrMoreTimes();
 
         $service = new DashboardService($repo);
-        $stats   = $service->getStats();
+        $stats = $service->getStats();
 
         $this->assertSame(
             1.0,

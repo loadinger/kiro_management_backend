@@ -28,8 +28,8 @@ class GetTrendsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'days'       => ['nullable', 'integer', 'in:7,30,90'],
-            'entities'   => ['nullable', 'array'],
+            'days' => ['nullable', 'integer', 'in:7,30,90'],
+            'entities' => ['nullable', 'array'],
             'entities.*' => ['string', 'in:movies,tv_shows,persons'],
         ];
     }
@@ -37,10 +37,10 @@ class GetTrendsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'days.in'        => '参数错误：days 只允许 7、30 或 90',
-            'days.integer'   => '参数错误：days 必须是整数',
+            'days.in' => '参数错误：days 只允许 7、30 或 90',
+            'days.integer' => '参数错误：days 必须是整数',
             'entities.array' => '参数错误：entities 格式不正确',
-            'entities.*.in'  => '参数错误：entities 包含不支持的实体类型',
+            'entities.*.in' => '参数错误：entities 包含不支持的实体类型',
         ];
     }
 
@@ -55,7 +55,7 @@ class GetTrendsRequest extends FormRequest
             return $data;
         }
 
-        $data['days']     = (int) ($data['days'] ?? 30);
+        $data['days'] = (int) ($data['days'] ?? 30);
         $data['entities'] = $data['entities'] ?? ['movies', 'tv_shows', 'persons'];
 
         return $data;

@@ -110,7 +110,7 @@ class JobControllerTest extends TestCase
         $token = auth('api')->login($user);
 
         $longQ = str_repeat('a', 101);
-        $response = $this->withToken($token)->getJson('/api/jobs?q=' . $longQ);
+        $response = $this->withToken($token)->getJson('/api/jobs?q='.$longQ);
 
         $response->assertStatus(200)
             ->assertJson(['code' => 422, 'data' => null]);

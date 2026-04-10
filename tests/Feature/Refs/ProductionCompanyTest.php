@@ -69,7 +69,7 @@ class ProductionCompanyTest extends TestCase
 
     public function test_show_returns_company(): void
     {
-        $company = (new ProductionCompany())->forceFill(['id' => 1, 'tmdb_id' => 420, 'name' => 'Marvel Studios']);
+        $company = (new ProductionCompany)->forceFill(['id' => 1, 'tmdb_id' => 420, 'name' => 'Marvel Studios']);
 
         $this->mock(ProductionCompanyService::class, function (MockInterface $mock) use ($company) {
             $mock->shouldReceive('findById')

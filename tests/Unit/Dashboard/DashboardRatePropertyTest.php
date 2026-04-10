@@ -74,7 +74,7 @@ class DashboardRatePropertyTest extends TestCase
             $value = random_int(0, $total);
 
             $expected = round($value / $total, 4);
-            $actual   = $this->computeRateViaService($total, $value, 'reconcile');
+            $actual = $this->computeRateViaService($total, $value, 'reconcile');
 
             $this->assertSame(
                 $expected,
@@ -97,7 +97,7 @@ class DashboardRatePropertyTest extends TestCase
             $rate = $this->computeRateViaService($total, $value, 'translation');
 
             if ($total === 0) {
-                $this->assertSame(1.0, $rate, "rate must be 1.0 when total=0");
+                $this->assertSame(1.0, $rate, 'rate must be 1.0 when total=0');
             } else {
                 $this->assertSame(
                     round($value / $total, 4),
@@ -119,7 +119,7 @@ class DashboardRatePropertyTest extends TestCase
      * Drive DashboardService::getStats() with a mocked repository that returns
      * a single row for the requested sub-item, then extract the computed rate.
      *
-     * @param  string $type  'reconcile' or 'translation'
+     * @param  string  $type  'reconcile' or 'translation'
      */
     private function computeRateViaService(int $total, int $value, string $type): float
     {
@@ -148,7 +148,7 @@ class DashboardRatePropertyTest extends TestCase
         Log::shouldReceive('error')->zeroOrMoreTimes();
 
         $service = new DashboardService($repo);
-        $stats   = $service->getStats();
+        $stats = $service->getStats();
 
         if ($type === 'reconcile') {
             return $stats['reconcile_rates']['movie_credits']['rate'];

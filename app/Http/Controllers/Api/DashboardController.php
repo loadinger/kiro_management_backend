@@ -30,7 +30,7 @@ class DashboardController extends BaseController
     public function trends(GetTrendsRequest $request): JsonResponse
     {
         $validated = $request->validated();
-        $data      = $this->dashboardService->getTrends($validated['days'], $validated['entities']);
+        $data = $this->dashboardService->getTrends($validated['days'], $validated['entities']);
 
         return $this->success($data);
     }

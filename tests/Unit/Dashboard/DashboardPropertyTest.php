@@ -61,10 +61,10 @@ class DashboardPropertyTest extends TestCase
             Log::shouldReceive('error')->zeroOrMoreTimes();
 
             $service = new DashboardService($repo);
-            $stats   = $service->getStats();
+            $stats = $service->getStats();
 
-            $reconcileRate    = $stats['reconcile_rates']['movie_credits']['rate'];
-            $translationRate  = $stats['translation_coverage']['departments']['rate'];
+            $reconcileRate = $stats['reconcile_rates']['movie_credits']['rate'];
+            $translationRate = $stats['translation_coverage']['departments']['rate'];
 
             if ($total === 0) {
                 $this->assertSame(1.0, $reconcileRate,
@@ -114,8 +114,8 @@ class DashboardPropertyTest extends TestCase
             $hoursAgo = random_int(0, 200);
 
             if ($useNull) {
-                $lastUpdatedAt  = null;
-                $expectedStale  = true;
+                $lastUpdatedAt = null;
+                $expectedStale = true;
             } else {
                 $lastUpdatedAt = Carbon::now()->subHours($hoursAgo)->toDateTimeString();
                 // Strictly greater than 48 hours → stale
@@ -134,7 +134,7 @@ class DashboardPropertyTest extends TestCase
             Log::shouldReceive('error')->zeroOrMoreTimes();
 
             $service = new DashboardService($repo);
-            $stats   = $service->getStats();
+            $stats = $service->getStats();
 
             $isStale = $stats['data_freshness']['movies']['is_stale'];
 
@@ -176,7 +176,7 @@ class DashboardPropertyTest extends TestCase
 
             // Pick a random subset as "present" dates
             $presentCount = random_int(0, 30);
-            $shuffled     = $fullSequence;
+            $shuffled = $fullSequence;
             shuffle($shuffled);
             $presentDates = array_slice($shuffled, 0, $presentCount);
 
@@ -190,12 +190,12 @@ class DashboardPropertyTest extends TestCase
             Log::shouldReceive('error')->zeroOrMoreTimes();
 
             $service = new DashboardService($repo);
-            $stats   = $service->getStats();
+            $stats = $service->getStats();
 
             $health = $stats['snapshot_health'];
 
             // Compute expected missing dates
-            $presentSet      = array_flip($presentDates);
+            $presentSet = array_flip($presentDates);
             $expectedMissing = array_values(
                 array_filter($fullSequence, fn (string $d) => ! isset($presentSet[$d]))
             );
@@ -246,7 +246,7 @@ class DashboardPropertyTest extends TestCase
         for ($i = 0; $i < 100; $i++) {
             Cache::flush();
 
-            $days     = $allowedDays[array_rand($allowedDays)];
+            $days = $allowedDays[array_rand($allowedDays)];
             $entities = ['movies', 'tv_shows', 'persons'];
 
             // Build the full date sequence for this iteration
@@ -262,7 +262,7 @@ class DashboardPropertyTest extends TestCase
                 foreach ($fullDates as $date) {
                     if (random_int(0, 1) === 1) {
                         $rows[$entity][] = [
-                            'date'  => $date,
+                            'date' => $date,
                             'count' => random_int(0, 1000),
                         ];
                     }
@@ -275,7 +275,7 @@ class DashboardPropertyTest extends TestCase
             Log::shouldReceive('error')->zeroOrMoreTimes();
 
             $service = new DashboardService($repo);
-            $result  = $service->getTrends($days, $entities);
+            $result = $service->getTrends($days, $entities);
 
             // dates length must equal days
             $this->assertCount($days, $result['dates'],

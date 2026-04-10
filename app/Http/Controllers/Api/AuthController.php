@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\JWTGuard;
 
 class AuthController extends BaseController
@@ -32,7 +33,7 @@ class AuthController extends BaseController
             // setToken allows parsing an expired token for refresh purposes,
             // bypassing the auth:api middleware which would reject expired tokens.
             $newToken = $guard->setToken($guard->getToken())->refresh();
-        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+        } catch (TokenExpiredException $e) {
             return $this->error('登录已过期，请重新登录', 401);
         } catch (\Throwable $e) {
             return $this->error('Token 无效，请重新登录', 401);
@@ -62,8 +63,8 @@ class AuthController extends BaseController
 
         $payload = [
             'access_token' => $token,
-            'token_type'   => 'bearer',
-            'expires_in'   => $guard->factory()->getTTL() * 60,
+            'token_type' => 'bearer',
+            'expires_in' => $guard->factory()->getTTL() * 60,
         ];
 
         if ($user !== null) {

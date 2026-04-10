@@ -6,6 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -23,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // 统一转换为信封格式
         $envelope = fn (int $code, string $message, mixed $data = null): JsonResponse => response()->json(['code' => $code, 'message' => $message, 'data' => $data]);
 
-        $exceptions->render(function (AuthenticationException $e, \Illuminate\Http\Request $request) use ($envelope) {
+        $exceptions->render(function (AuthenticationException $e, Request $request) use ($envelope) {
             return $envelope(401, '未认证，请先登录');
         });
 

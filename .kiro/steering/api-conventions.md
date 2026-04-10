@@ -227,6 +227,7 @@ GET /api/tv-episode-images?tv_episode_id=101
 
 ---
 
-- 日期字段：`Y-m-d`，如 `"release_date": "2023-07-12"`
-- 时间戳字段：ISO 8601，如 `"created_at": "2023-07-12T10:30:00Z"`
+- 日期字段（`date` 类型）：`Y-m-d`，如 `"release_date": "2023-07-12"`，Resource 层用 `$this->release_date?->format('Y-m-d')` 输出，禁止直接输出 Carbon 对象（会序列化为完整 datetime 字符串）
+- 时间戳字段（`timestamp` 类型）：ISO 8601，不含微秒，如 `"created_at": "2023-07-12T10:30:00Z"`
 - 时区：统一 UTC
+- Resource 层时间戳统一用 `$this->created_at?->format('Y-m-d\TH:i:s\Z')` 输出，禁止直接输出 Carbon 对象（会带 `.000000Z` 微秒后缀）

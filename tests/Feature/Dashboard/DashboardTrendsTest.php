@@ -17,8 +17,7 @@ class DashboardTrendsTest extends TestCase
     /**
      * Build a mock trends response for the given days and entities.
      *
-     * @param  int           $days
-     * @param  array<string> $entities
+     * @param  array<string>  $entities
      * @return array{dates: array<string>, series: array<string, array<int>>}
      */
     private function mockTrendsData(int $days = 30, array $entities = ['movies', 'tv_shows', 'persons']): array
@@ -55,15 +54,15 @@ class DashboardTrendsTest extends TestCase
     public function test_invalid_days_parameter_returns_422(): void
     {
         // Feature: dashboard, Property 9: trends 非法参数返回 422
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $this->withToken($token)->getJson('/api/dashboard/trends?days=999')
             ->assertStatus(200)
             ->assertJson([
-                'code'    => 422,
+                'code' => 422,
                 'message' => '参数错误：days 只允许 7、30 或 90',
-                'data'    => null,
+                'data' => null,
             ]);
     }
 
@@ -74,15 +73,15 @@ class DashboardTrendsTest extends TestCase
     public function test_invalid_entities_parameter_returns_422(): void
     {
         // Feature: dashboard, Property 9: trends 非法参数返回 422
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $this->withToken($token)->getJson('/api/dashboard/trends?entities=movies,invalid_entity')
             ->assertStatus(200)
             ->assertJson([
-                'code'    => 422,
+                'code' => 422,
                 'message' => '参数错误：entities 包含不支持的实体类型',
-                'data'    => null,
+                'data' => null,
             ]);
     }
 
@@ -101,7 +100,7 @@ class DashboardTrendsTest extends TestCase
                 ->andReturn($this->mockTrendsData($days, ['movies', 'tv_shows', 'persons']));
         });
 
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $response = $this->withToken($token)->getJson("/api/dashboard/trends?days={$days}");
@@ -121,7 +120,7 @@ class DashboardTrendsTest extends TestCase
     public function test_series_arrays_have_same_length_as_dates(): void
     {
         // Feature: dashboard, Property 10: trends 响应 dates 与 series 等长
-        $days     = 30;
+        $days = 30;
         $entities = ['movies', 'tv_shows', 'persons'];
 
         $this->mock(DashboardService::class, function (MockInterface $mock) use ($days, $entities) {
@@ -130,14 +129,14 @@ class DashboardTrendsTest extends TestCase
                 ->andReturn($this->mockTrendsData($days, $entities));
         });
 
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $response = $this->withToken($token)->getJson("/api/dashboard/trends?days={$days}");
 
         $response->assertStatus(200)->assertJson(['code' => 0]);
 
-        $dates  = $response->json('data.dates');
+        $dates = $response->json('data.dates');
         $series = $response->json('data.series');
 
         $this->assertIsArray($dates);
@@ -167,7 +166,7 @@ class DashboardTrendsTest extends TestCase
                 ->andReturn($this->mockTrendsData(30, ['movies', 'tv_shows', 'persons']));
         });
 
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $response = $this->withToken($token)->getJson('/api/dashboard/trends');

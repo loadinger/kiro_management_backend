@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\ReferenceData;
 
+use App\Exceptions\AppException;
 use App\Models\TvNetwork;
 use App\Models\User;
 use App\Services\TvNetworkService;
@@ -88,7 +89,7 @@ class TvNetworkControllerTest extends TestCase
         $token = auth('api')->login($user);
 
         $longQ = str_repeat('a', 101);
-        $response = $this->withToken($token)->getJson('/api/tv-networks?q=' . $longQ);
+        $response = $this->withToken($token)->getJson('/api/tv-networks?q='.$longQ);
 
         $response->assertStatus(200)
             ->assertJson(['code' => 422, 'data' => null]);
@@ -115,7 +116,7 @@ class TvNetworkControllerTest extends TestCase
             $mock->shouldReceive('findById')
                 ->once()
                 ->with(9999)
-                ->andThrow(new \App\Exceptions\AppException('电视网络不存在', 404));
+                ->andThrow(new AppException('电视网络不存在', 404));
         });
 
         $user = User::factory()->create();
@@ -131,7 +132,7 @@ class TvNetworkControllerTest extends TestCase
     // Validates: Requirements 11.4, 11.6
     public function test_show_returns_full_detail_fields(): void
     {
-        $network = (new TvNetwork())->forceFill([
+        $network = (new TvNetwork)->forceFill([
             'id' => 1,
             'tmdb_id' => 213,
             'name' => 'Netflix',
@@ -156,18 +157,18 @@ class TvNetworkControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson(['code' => 0])
             ->assertJsonStructure([
-                'data' => ['id', 'tmdb_id', 'name', 'headquarters', 'homepage', 'logo_url', 'origin_country'],
+                'data' => ['id', 'tmdb_id', 'name', 'headquarters', 'homepage', 'logo_path', 'origin_country'],
             ]);
 
-        $logoUrl = $response->json('data.logo_url');
+        $logoUrl = $response->json('data.logo_path');
         $this->assertStringContainsString('w342', $logoUrl);
     }
 
-    // Feature: reference-data, Property 13: logo_path null returns logo_url null
+    // Feature: reference-data, Property 13: logo_path null returns logo_path null
     // Validates: Requirements 11.7
     public function test_logo_url_is_null_when_logo_path_is_null(): void
     {
-        $network = (new TvNetwork())->forceFill([
+        $network = (new TvNetwork)->forceFill([
             'id' => 2,
             'tmdb_id' => 214,
             'name' => 'No Logo Network',
@@ -191,6 +192,6 @@ class TvNetworkControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(['code' => 0])
-            ->assertJson(['data' => ['logo_url' => null]]);
+            ->assertJson(['data' => ['logo_path' => null]]);
     }
 }

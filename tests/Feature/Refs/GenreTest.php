@@ -6,9 +6,9 @@ namespace Tests\Feature\Refs;
 
 use App\Models\User;
 use App\Services\GenreService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 use Mockery\MockInterface;
 use Tests\TestCase;
 
@@ -85,7 +85,7 @@ class GenreTest extends TestCase
         $this->mock(GenreService::class, function (MockInterface $mock) {
             $mock->shouldReceive('getAll')
                 ->once()
-                ->andReturn(new Collection());
+                ->andReturn(new Collection);
         });
 
         $this->withToken($this->token())->getJson('/api/genres/all')

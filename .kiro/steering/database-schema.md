@@ -195,7 +195,10 @@
 ## 第 1 层：关系表（多对多）
 
 ### movie_genres / movie_keywords / movie_production_companies
-各含 `(movie_id, {entity}_id)` 唯一约束。
+各含唯一约束，关联字段名：
+- `movie_genres`：`genre_id`
+- `movie_keywords`：`keyword_id`
+- `movie_production_companies`：`company_id`（注意：不是 `production_company_id`）
 
 ### movie_credits（演职人员，异步关联）
 | 字段 | 类型 | 说明 |

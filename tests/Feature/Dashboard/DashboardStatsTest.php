@@ -19,39 +19,39 @@ class DashboardStatsTest extends TestCase
     {
         return [
             'entity_counts' => [
-                'movies'               => 1050000,
-                'tv_shows'             => 210000,
-                'persons'              => 5200000,
-                'tv_seasons'           => 980000,
-                'tv_episodes'          => 20000000,
-                'keywords'             => 450000,
-                'collections'          => 12000,
-                'tv_networks'          => 3500,
+                'movies' => 1050000,
+                'tv_shows' => 210000,
+                'persons' => 5200000,
+                'tv_seasons' => 980000,
+                'tv_episodes' => 20000000,
+                'keywords' => 450000,
+                'collections' => 12000,
+                'tv_networks' => 3500,
                 'production_companies' => 180000,
             ],
             'reconcile_rates' => [
-                'movie_credits'      => ['total' => 50000000, 'resolved' => 48000000, 'rate' => 0.9600],
-                'tv_show_creators'   => ['total' => 120000,   'resolved' => 115000,   'rate' => 0.9583],
+                'movie_credits' => ['total' => 50000000, 'resolved' => 48000000, 'rate' => 0.9600],
+                'tv_show_creators' => ['total' => 120000,   'resolved' => 115000,   'rate' => 0.9583],
                 'tv_episode_credits' => ['total' => 80000000, 'resolved' => 75000000, 'rate' => 0.9375],
-                'collection_movies'  => ['total' => 60000,    'resolved' => 58000,    'rate' => 0.9667],
+                'collection_movies' => ['total' => 60000,    'resolved' => 58000,    'rate' => 0.9667],
             ],
             'translation_coverage' => [
                 'departments' => ['total' => 20,     'translated' => 20,     'rate' => 1.0000],
-                'jobs'        => ['total' => 3000,   'translated' => 2800,   'rate' => 0.9333],
-                'keywords'    => ['total' => 450000, 'translated' => 200000, 'rate' => 0.4444],
-                'languages'   => ['total' => 180,    'translated' => 180,    'rate' => 1.0000],
+                'jobs' => ['total' => 3000,   'translated' => 2800,   'rate' => 0.9333],
+                'keywords' => ['total' => 450000, 'translated' => 200000, 'rate' => 0.4444],
+                'languages' => ['total' => 180,    'translated' => 180,    'rate' => 1.0000],
             ],
             'data_freshness' => [
-                'movies'      => ['last_updated_at' => '2024-01-15T08:30:00Z', 'is_stale' => false],
-                'tv_shows'    => ['last_updated_at' => '2024-01-15T08:30:00Z', 'is_stale' => false],
-                'persons'     => ['last_updated_at' => '2024-01-14T06:00:00Z', 'is_stale' => false],
-                'tv_seasons'  => ['last_updated_at' => '2024-01-15T08:30:00Z', 'is_stale' => false],
+                'movies' => ['last_updated_at' => '2024-01-15T08:30:00Z', 'is_stale' => false],
+                'tv_shows' => ['last_updated_at' => '2024-01-15T08:30:00Z', 'is_stale' => false],
+                'persons' => ['last_updated_at' => '2024-01-14T06:00:00Z', 'is_stale' => false],
+                'tv_seasons' => ['last_updated_at' => '2024-01-15T08:30:00Z', 'is_stale' => false],
                 'tv_episodes' => ['last_updated_at' => '2024-01-15T08:30:00Z', 'is_stale' => false],
-                'keywords'    => ['last_updated_at' => null,                   'is_stale' => true],
+                'keywords' => ['last_updated_at' => null,                   'is_stale' => true],
             ],
             'snapshot_health' => [
-                'checked_days'  => 30,
-                'healthy_days'  => 28,
+                'checked_days' => 30,
+                'healthy_days' => 28,
                 'missing_dates' => ['2024-01-10', '2024-01-11'],
             ],
         ];
@@ -80,7 +80,7 @@ class DashboardStatsTest extends TestCase
             $mock->shouldReceive('getStats')->once()->andReturn($this->mockStatsData());
         });
 
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $this->withToken($token)->getJson('/api/dashboard/stats')
@@ -108,7 +108,7 @@ class DashboardStatsTest extends TestCase
             $mock->shouldReceive('getStats')->once()->andReturn($this->mockStatsData());
         });
 
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $response = $this->withToken($token)->getJson('/api/dashboard/stats');
@@ -142,7 +142,7 @@ class DashboardStatsTest extends TestCase
             $mock->shouldReceive('getStats')->once()->andReturn($this->mockStatsData());
         });
 
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $response = $this->withToken($token)->getJson('/api/dashboard/stats');
@@ -182,7 +182,7 @@ class DashboardStatsTest extends TestCase
             $mock->shouldReceive('getStats')->once()->andReturn($this->mockStatsData());
         });
 
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $response = $this->withToken($token)->getJson('/api/dashboard/stats');
@@ -222,7 +222,7 @@ class DashboardStatsTest extends TestCase
             $mock->shouldReceive('getStats')->once()->andReturn($this->mockStatsData());
         });
 
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $response = $this->withToken($token)->getJson('/api/dashboard/stats');
@@ -264,7 +264,7 @@ class DashboardStatsTest extends TestCase
             $mock->shouldReceive('getStats')->once()->andReturn($this->mockStatsData());
         });
 
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $response = $this->withToken($token)->getJson('/api/dashboard/stats');
@@ -306,25 +306,25 @@ class DashboardStatsTest extends TestCase
         // Feature: dashboard, Property 11: 子项失败不影响其他子项
         $this->mock(DashboardService::class, function (MockInterface $mock) {
             $mock->shouldReceive('getStats')->once()->andReturn([
-                'entity_counts'        => null, // simulates a failed sub-query
-                'reconcile_rates'      => [
+                'entity_counts' => null, // simulates a failed sub-query
+                'reconcile_rates' => [
                     'movie_credits' => ['total' => 100, 'resolved' => 90, 'rate' => 0.9000],
                 ],
                 'translation_coverage' => [
                     'departments' => ['total' => 20, 'translated' => 20, 'rate' => 1.0000],
                 ],
-                'data_freshness'       => [
+                'data_freshness' => [
                     'movies' => ['last_updated_at' => '2024-01-15T08:30:00Z', 'is_stale' => false],
                 ],
-                'snapshot_health'      => [
-                    'checked_days'  => 30,
-                    'healthy_days'  => 30,
+                'snapshot_health' => [
+                    'checked_days' => 30,
+                    'healthy_days' => 30,
                     'missing_dates' => [],
                 ],
             ]);
         });
 
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = auth('api')->login($user);
 
         $response = $this->withToken($token)->getJson('/api/dashboard/stats');

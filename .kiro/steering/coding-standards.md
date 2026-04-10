@@ -79,6 +79,7 @@ public function index(ListMovieRequest $request): JsonResponse
 - 异步关联字段（`person_id` 为 NULL）做 null 安全处理，不报错
 - 列表接口用 `JsonResource::collection()`，详情用单个 Resource
 - 禁止在 Resource 中触发额外查询（数据应由 Service 层预加载好）
+- 禁止在 Resource（及其他任何层）中转换字段名称，输出字段名必须与数据库字段名保持一致（特殊情况或有明确业务需要时例外，需注释说明原因）
 
 ---
 

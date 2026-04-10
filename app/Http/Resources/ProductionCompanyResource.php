@@ -19,7 +19,7 @@ class ProductionCompanyResource extends JsonResource
             'description' => $this->description,
             'headquarters' => $this->headquarters,
             'homepage' => $this->homepage,
-            'logo_url' => ImageHelper::url($this->logo_path, 'w342'),
+            'logo_path' => ImageHelper::url($this->logo_path, 'w342'),
             'origin_country' => $this->origin_country,
             'parent_company_tmdb_id' => $this->parent_company_tmdb_id,
         ];

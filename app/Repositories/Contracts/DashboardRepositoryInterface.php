@@ -73,8 +73,8 @@ interface DashboardRepositoryInterface
      *
      * Uses the (list_type, snapshot_date, rank) index to avoid full table scans.
      *
-     * @param  int    $days  Number of days to look back (e.g. 30)
-     * @return array<int, string>  Array of date strings in 'Y-m-d' format
+     * @param  int  $days  Number of days to look back (e.g. 30)
+     * @return array<int, string> Array of date strings in 'Y-m-d' format
      */
     public function getSnapshotDates(int $days): array;
 
@@ -85,10 +85,10 @@ interface DashboardRepositoryInterface
      * For the 'persons' table a WHERE created_at >= NOW() - INTERVAL $days DAY
      * condition is always applied to leverage the created_at index.
      *
-     * @param  int           $days      Number of days to look back
-     * @param  array<string> $entities  Entity names to query, e.g. ['movies', 'tv_shows', 'persons']
+     * @param  int  $days  Number of days to look back
+     * @param  array<string>  $entities  Entity names to query, e.g. ['movies', 'tv_shows', 'persons']
      * @return array<string, array<int, array{date: string, count: int}>>
-     *         Keyed by entity name; each value is an array of ['date' => 'Y-m-d', 'count' => int] rows
+     *                                                                    Keyed by entity name; each value is an array of ['date' => 'Y-m-d', 'count' => int] rows
      */
     public function getTrendRows(int $days, array $entities): array;
 }

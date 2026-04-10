@@ -17,7 +17,7 @@ class TvNetworkListResource extends JsonResource
             'tmdb_id' => $this->tmdb_id,
             'name' => $this->name,
             'origin_country' => $this->origin_country,
-            'logo_url' => ImageHelper::url($this->logo_path, 'w185'),
+            'logo_path' => ImageHelper::url($this->logo_path, 'w185'),
         ];
     }
 }

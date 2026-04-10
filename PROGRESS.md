@@ -11,22 +11,27 @@
 ### System
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
-| S-01 | Auth：login / logout / refresh / me | 进行中 | Spec 已创建，待实现 users migration + seeder + 测试 |
+| S-01 | Auth：login / logout / refresh / me | 已完成 | login / logout / refresh / me 全部实现，10 个测试通过 |
 | S-02 | Global Search：`GET /api/search?q=` | 待开始 | 跨表搜索 movies / tv_shows / persons，每表 ≤ 10 条 |
-| S-03 | LLM 翻译：`php artisan translate:names` | 待开始 | 对 departments / jobs / keywords / languages 的 name 字段做中文翻译，写入 name_zh |
+| S-03 | LLM 翻译：`php artisan translate:names` | 已完成 | Artisan Command + TranslationService + LlmTranslationService 全部实现，migration 已添加 name_zh / translated_at 字段，暂无自动化测试 |
 | S-04 | Dashboard 数据统计：`GET /api/dashboard/stats` + `GET /api/dashboard/trends` | 已完成 | 各实体总量、近期新增趋势折线图、异步关联完成率、翻译覆盖率、数据新鲜度、每日采集健康度 |
 
 ### Movies
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
-| M-01 | Movie List：列表，支持排序、过滤、搜索 | 待开始 | |
-| M-02 | Movie Detail：详情 | 待开始 | |
-| M-03 | Movie Credits：list | 待开始 | |
-| M-04 | Movie Images：list | 待开始 | |
-| M-05 | Movie Genres：list | 待开始 | |
-| M-06 | Movie Keywords：list | 待开始 | |
-| M-07 | Movie Production Companies：list | 待开始 | |
-| M-08 | Movie Collections：list | 待开始 | |
+| M-01 | Movie List：列表，支持排序、过滤、搜索 | 已完成 | 支持 q/genre_id/status/release_year/adult 筛选，默认 id 降序，page 最大 1000 |
+| M-02 | Movie Detail：详情 | 已完成 | 全字段输出，不存在返回 404 |
+| M-03 | Movie Credits：list | 已完成 | 支持 credit_type 筛选，person_id 异步关联 null 安全处理 |
+| M-04 | Movie Images：list | 已完成 | 支持 image_type 筛选，backdrop/poster/logo 不同 size |
+| M-05 | Movie Genres：list | 已完成 | 不分页，movie_id 必填 |
+| M-06 | Movie Keywords：list | 已完成 | 不分页，movie_id 必填 |
+| M-07 | Movie Production Companies：list | 已完成 | 不分页，movie_id 必填 |
+
+### Collections
+| # | 接口 | 状态 | 备注 |
+|---|------|------|------|
+| C-01 | Collection List：列表，支持搜索 | 已完成 | 支持 q 参数搜索，分页 |
+| C-02 | Collection Detail：详情（含关联电影列表） | 已完成 | collection_movies 异步关联，movie_id 可为 null，resolved 字段标识关联状态 |
 
 ### TV Shows
 | # | 接口 | 状态 | 备注 |
@@ -64,7 +69,13 @@
 ### Media List Snapshots
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
-| ML-01 | Media List Snapshots：list | 待开始 | 按 list_type + snapshot_date 查询 |
+| ML-01 | Movie Now Playing：正在热映 | 待开始 | list_type=movie_now_playing |
+| ML-02 | Movie Upcoming：即将上映 | 待开始 | list_type=movie_upcoming |
+| ML-03 | Movie Trending：热门电影（日/周） | 待开始 | list_type=movie_trending_day / movie_trending_week |
+| ML-04 | TV Airing Today：今日播出 | 待开始 | list_type=tv_airing_today |
+| ML-05 | TV On The Air：即将播出 | 待开始 | list_type=tv_on_the_air |
+| ML-06 | TV Trending：热门剧集（日/周） | 待开始 | list_type=tv_trending_day / tv_trending_week |
+| ML-07 | Person Trending：热门人物（日/周） | 待开始 | list_type=person_trending_day / person_trending_week |
 
 ### 基础参考数据
 | # | 接口 | 状态 | 备注 |
@@ -78,6 +89,24 @@
 ---
 
 ## 开发日志
+
+### 2026-03-26 — Auth 模块完成
+
+**完成内容：**
+- 实现 login / logout / refresh / me 四个接口
+- LoginRequest 参数验证（email + password，含中文错误信息）
+- UserResource 明确排除 password / remember_token 敏感字段
+- refresh 路由不走 auth:api middleware，允许携带过期 token 换新 token
+- login 接口加 throttle:10,1 限流防暴力破解
+- 10 个 Feature Test 全部通过，覆盖正常流程、错误凭证、缺失 token、token 黑名单验证
+
+**已注册路由：**
+- `POST /api/auth/login`（无需认证，限流 10次/分钟/IP）
+- `POST /api/auth/refresh`（无需认证）
+- `POST /api/auth/logout`（需认证）
+- `GET /api/auth/me`（需认证）
+
+---
 
 ### 2026-03-28 — reference-data Spec 完成
 
@@ -124,6 +153,27 @@
 
 ---
 
+### 2026-04-04 — LLM 翻译模块完成
+
+**完成内容：**
+- `TranslateNamesCommand`：Artisan Command，支持 `--table`、`--batch-size`、`--limit` 参数，带进度条和统计输出
+- `TranslationService`：按表分发，cursor-based 分页（`WHERE id > $afterId`）支持断点续传，jobs 表携带 department.name 上下文，空 source 字段自动标记跳过
+- `LlmTranslationService`：封装 Ollama `/api/chat` 调用，三级重试（全批 → 5条子批 → 单条），多层 JSON 容错（bracket-depth 扫描 + 格式兼容 `text` 字段回退）
+- Migration：为 departments / jobs / keywords / languages 添加 `name_zh`（nullable varchar）和 `translated_at`（nullable timestamp），带 `hasTable()` 守卫兼容测试环境
+- `config/services.php` 注册 Ollama 配置（`base_url` / `model` / `timeout`）
+
+**用法：**
+```bash
+php artisan translate:names --table=keywords --batch-size=20
+php artisan translate:names --table=all
+php artisan translate:names --table=keywords --limit=100
+```
+
+**待补充：**
+- Unit Test（TranslationService / LlmTranslationService mock 测试）
+
+---
+
 ### 2026-04-04 — dashboard Spec 完成
 
 **完成内容：**
@@ -136,6 +186,45 @@
 **已注册路由：**
 - `GET /api/dashboard/stats`
 - `GET /api/dashboard/trends?days=30&entities=movies,tv_shows,persons`
+
+---
+
+### 2026-04-10 — movie Spec 完成
+
+**完成内容：**
+- 实现 Movie API 模块，提供 7 个只读接口
+- 标准分层架构：Movie / MovieCredit / MovieImage / Person Model → Repository → Service → FormRequest → Resource → Controller → Route
+- 电影列表支持 `q`（标题前缀搜索）、`genre_id`、`status`、`release_year`、`adult` 筛选，默认 `id` 降序，`page` 最大 1000
+- 电影详情不存在时抛出 `AppException` 返回 `code: 404`
+- 演职人员列表支持 `credit_type` 筛选，`person_id` 异步关联 null 安全处理（`person` 字段为 null 不报错）
+- 图片列表支持 `image_type` 筛选，backdrop 使用 `w780`，poster/logo 使用 `w342`
+- 类型/关键词/制作公司列表不分页，`movie_id` 必填
+- `CreditType` enum 定义（cast / crew）
+- 全部路由注册在 `auth:api` middleware 组内
+
+**已注册路由：**
+- `GET /api/movies`
+- `GET /api/movies/{id}`
+- `GET /api/movie-credits?movie_id=`
+- `GET /api/movie-images?movie_id=`
+- `GET /api/movie-genres?movie_id=`
+- `GET /api/movie-keywords?movie_id=`
+- `GET /api/movie-production-companies?movie_id=`
+
+---
+
+### 2026-04-10 — collections Spec 完成
+
+**完成内容：**
+- 实现 Collections（合集）API 模块，提供两个只读接口
+- 标准分层架构：Collection / CollectionMovie Model → CollectionRepositoryInterface → CollectionRepository → CollectionService → ListCollectionRequest → CollectionListResource / CollectionResource / CollectionMovieResource → CollectionController → Route
+- 列表接口支持 `q` 参数模糊搜索（`LIKE %q%`），分页参数 page（最大 1000）/ per_page（最大 100）
+- 详情接口预加载 `collection_movies` 关联，`movie_id` 为 null 时 `resolved=false`，不报错
+- 全部路由注册在 `auth:api` middleware 组内
+
+**已注册路由：**
+- `GET /api/collections`
+- `GET /api/collections/{id}`
 
 ---
 
