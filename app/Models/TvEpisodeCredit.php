@@ -30,4 +30,9 @@ class TvEpisodeCredit extends Model
     {
         return $this->belongsTo(Person::class, 'person_id');
     }
+
+    public function tvEpisode(): BelongsTo
+    {
+        return $this->belongsTo(TvEpisode::class);
+    }
 }

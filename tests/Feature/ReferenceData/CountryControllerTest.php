@@ -47,8 +47,8 @@ class CountryControllerTest extends TestCase
                 'code',
                 'message',
                 'data' => [
-                    'items',
-                    'meta' => ['total', 'page', 'per_page', 'last_page'],
+                    'list',
+                    'pagination' => ['total', 'page', 'per_page', 'last_page'],
                 ],
             ]);
     }

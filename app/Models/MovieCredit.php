@@ -29,4 +29,12 @@ class MovieCredit extends Model
     {
         return $this->belongsTo(Person::class, 'person_id');
     }
+
+    /**
+     * Get the movie associated with this credit.
+     */
+    public function movie(): BelongsTo
+    {
+        return $this->belongsTo(Movie::class);
+    }
 }

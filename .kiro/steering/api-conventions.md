@@ -179,13 +179,16 @@ GET /api/tv-episode-images?tv_episode_id=101
 
 ---
 
-## 图片 URL 规范
+## 图片路径规范
 
-数据库存储 TMDB 相对路径（如 `/abc123.jpg`），API 输出时由 Resource 层统一拼接。
+数据库存储 TMDB 相对路径（如 `/abc123.jpg`），API 输出时由 Resource 层统一通过 `ImageHelper::url()` 处理。
 
 - 实现：`App\Helpers\ImageHelper::url(?string $path, string $size): ?string`
+- 输出相对路径（如 `/abc123.jpg`），**不拼接域名和 size 前缀**，由前端自行维护 TMDB base URL
+- `$size` 参数保留，用于标注推荐尺寸，便于前端按场景选择
 - path 为 null 时返回 null
-- 禁止在 Controller 层拼接图片 URL
+- 禁止在 Controller 层处理图片路径
+- 图片字段命名保持与数据库一致（`poster_path`、`profile_path` 等），不使用 `_url` 后缀
 
 各实体推荐 size 见 `.kiro/steering/data-flow.md`。
 

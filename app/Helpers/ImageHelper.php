@@ -6,18 +6,13 @@ namespace App\Helpers;
 
 class ImageHelper
 {
-    private const BASE_URL = 'https://image.tmdb.org/t/p';
-
     /**
-     * Build a full TMDB image URL from a relative path and size.
+     * Return the relative TMDB image path as-is.
      * Returns null when path is null.
+     * The $size parameter is kept for call-site compatibility but is not used.
      */
     public static function url(?string $path, string $size): ?string
     {
-        if ($path === null) {
-            return null;
-        }
-
-        return self::BASE_URL.'/'.$size.$path;
+        return $path;
     }
 }

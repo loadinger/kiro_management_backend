@@ -36,46 +36,48 @@
 ### TV Shows
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
-| T-01 | TV Show List：列表，支持排序、过滤、搜索 | 待开始 | |
-| T-02 | TV Show Detail：详情 | 待开始 | |
-| T-03 | TV Show Creators：list | 待开始 | |
-| T-04 | TV Show Genres：list | 待开始 | |
-| T-05 | TV Show Images：list | 待开始 | |
-| T-06 | TV Show Keywords：list | 待开始 | |
-| T-07 | TV Show Networks：list | 待开始 | |
-| T-08 | TV Show Production Companies：list | 待开始 | |
+| T-01 | TV Show List：列表，支持排序、过滤、搜索 | 已完成 | |
+| T-02 | TV Show Detail：详情 | 已完成 | |
+| T-03 | TV Show Creators：list | 已完成 | tv_show_id 必填，person_id 异步关联 null 安全处理 |
+| T-04 | TV Show Genres：list | 已完成 | tv_show_id 必填，不分页 |
+| T-05 | TV Show Images：list | 已完成 | tv_show_id 必填，支持 image_type 筛选 |
+| T-06 | TV Show Keywords：list | 已完成 | tv_show_id 必填，不分页 |
+| T-07 | TV Show Networks：list | 已完成 | tv_show_id 必填，不分页 |
+| T-08 | TV Show Production Companies：list | 已完成 | tv_show_id 必填，不分页 |
 
 ### TV Seasons
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
-| TS-01 | TV Season List：列表，支持排序、搜索 | 待开始 | 必须带 tv_show_id |
-| TS-02 | TV Season Detail：详情 | 待开始 | |
-| TS-03 | TV Season Images：list | 待开始 | |
+| TS-01 | TV Season List：列表，支持排序、搜索 | 已完成 | tv_show_id 必填 |
+| TS-02 | TV Season Detail：详情 | 已完成 | |
+| TS-03 | TV Season Images：list | 已完成 | tv_season_id 必填 |
 
 ### TV Episodes
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
-| TE-01 | TV Episode List：列表，支持排序、搜索 | 待开始 | 必须带 tv_season_id |
-| TE-02 | TV Episode Detail：详情 | 待开始 | |
-| TE-03 | TV Episode Credits：list | 待开始 | |
-| TE-04 | TV Episode Images：list | 待开始 | |
+| TE-01 | TV Episode List：列表，支持排序、搜索 | 已完成 | tv_season_id 必填 |
+| TE-02 | TV Episode Detail：详情 | 已完成 | |
+| TE-03 | TV Episode Credits：list | 已完成 | tv_episode_id 必填，person_id 异步关联 null 安全处理 |
+| TE-04 | TV Episode Images：list | 已完成 | tv_episode_id 必填 |
 
 ### Persons
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
-| P-01 | Person List：列表，支持排序、过滤、搜索 | 待开始 | 大表，per_page ≤ 50 |
-| P-02 | Person Detail：详情 | 待开始 | |
+| P-01 | Person List：列表，支持排序、过滤、搜索 | 已完成 | 大表，per_page ≤ 50，支持 gender/adult/known_for_department/q 筛选 |
+| P-02 | Person Detail：详情 | 已完成 | 全字段输出，不存在返回 404 |
+| P-03 | Person Movies：人物参演电影列表 | 已完成 | person_id 必填，平铺输出 credit + movie 字段 |
+| P-04 | Person TV Shows：人物参演电视剧列表 | 已完成 | person_id 必填，以 tv_show 为单位去重，JOIN + DISTINCT |
 
 ### Media List Snapshots
 | # | 接口 | 状态 | 备注 |
 |---|------|------|------|
-| ML-01 | Movie Now Playing：正在热映 | 待开始 | list_type=movie_now_playing |
-| ML-02 | Movie Upcoming：即将上映 | 待开始 | list_type=movie_upcoming |
-| ML-03 | Movie Trending：热门电影（日/周） | 待开始 | list_type=movie_trending_day / movie_trending_week |
-| ML-04 | TV Airing Today：今日播出 | 待开始 | list_type=tv_airing_today |
-| ML-05 | TV On The Air：即将播出 | 待开始 | list_type=tv_on_the_air |
-| ML-06 | TV Trending：热门剧集（日/周） | 待开始 | list_type=tv_trending_day / tv_trending_week |
-| ML-07 | Person Trending：热门人物（日/周） | 待开始 | list_type=person_trending_day / person_trending_week |
+| ML-01 | Movie Now Playing：正在热映 | 已完成 | list_type=movie_now_playing |
+| ML-02 | Movie Upcoming：即将上映 | 已完成 | list_type=movie_upcoming |
+| ML-03 | Movie Trending：热门电影（日/周） | 已完成 | list_type=movie_trending_day / movie_trending_week |
+| ML-04 | TV Airing Today：今日播出 | 已完成 | list_type=tv_airing_today |
+| ML-05 | TV On The Air：即将播出 | 已完成 | list_type=tv_on_the_air |
+| ML-06 | TV Trending：热门剧集（日/周） | 已完成 | list_type=tv_trending_day / tv_trending_week |
+| ML-07 | Person Trending：热门人物（日/周） | 已完成 | list_type=person_trending_day / person_trending_week |
 
 ### 基础参考数据
 | # | 接口 | 状态 | 备注 |
@@ -189,6 +191,35 @@ php artisan translate:names --table=keywords --limit=100
 
 ---
 
+### 2026-04-10 — TV Shows / TV Seasons / TV Episodes Spec 完成
+
+**完成内容：**
+- 实现 TV Show API 模块：列表（支持 q/genre_id/status/adult 筛选，默认 id 降序，page 最大 1000）、详情、及 6 个子资源接口（creators / genres / images / keywords / networks / production-companies）
+- 实现 TV Season API 模块：列表（tv_show_id 必填）、详情、图片列表
+- 实现 TV Episode API 模块：列表（tv_season_id 必填，大表约束）、详情、演职人员列表、图片列表
+- 标准分层架构：Model → Repository → Service → FormRequest → Resource → Controller → Route
+- 异步关联 null 安全处理：tv_show_creators / tv_episode_credits 的 person_id 为 null 时不报错
+- 全部路由注册在 `auth:api` middleware 组内
+
+**已注册路由：**
+- `GET /api/tv-shows`
+- `GET /api/tv-shows/{id}`
+- `GET /api/tv-show-creators?tv_show_id=`
+- `GET /api/tv-show-genres?tv_show_id=`
+- `GET /api/tv-show-images?tv_show_id=`
+- `GET /api/tv-show-keywords?tv_show_id=`
+- `GET /api/tv-show-networks?tv_show_id=`
+- `GET /api/tv-show-production-companies?tv_show_id=`
+- `GET /api/tv-seasons?tv_show_id=`
+- `GET /api/tv-seasons/{id}`
+- `GET /api/tv-season-images?tv_season_id=`
+- `GET /api/tv-episodes?tv_season_id=`
+- `GET /api/tv-episodes/{id}`
+- `GET /api/tv-episode-credits?tv_episode_id=`
+- `GET /api/tv-episode-images?tv_episode_id=`
+
+---
+
 ### 2026-04-10 — movie Spec 完成
 
 **完成内容：**
@@ -228,7 +259,51 @@ php artisan translate:names --table=keywords --limit=100
 
 ---
 
-## 决策记录
+### 2026-04-11 — media-list-snapshots Spec 完成
+
+**完成内容：**
+- 实现 Media List Snapshots 模块，提供 10 个只读榜单快照接口
+- 标准分层架构：MediaListSnapshot Model → MediaListSnapshotRepositoryInterface → MediaListSnapshotRepository → MediaListSnapshotService → GetMediaListRequest → MovieSnapshotResource / TvShowSnapshotResource / PersonSnapshotResource → MediaListSnapshotController → Route
+- `ListType` enum 定义 10 个榜单类型，含 `isMovie()` / `isTvShow()` / `isPerson()` 辅助方法
+- Service 层批量关联实体（`local_id` 优先，降级 `tmdb_id`），避免 N+1，实体不存在时字段输出 null 不报错
+- 支持 `snapshot_date` 参数（`Y-m-d` 格式），不传时自动取最新快照日期
+- 全部路由注册在 `auth:api` middleware 组内，227 个测试全部通过
+
+**已注册路由：**
+- `GET /api/media-lists/movie-now-playing`
+- `GET /api/media-lists/movie-upcoming`
+- `GET /api/media-lists/movie-trending-day`
+- `GET /api/media-lists/movie-trending-week`
+- `GET /api/media-lists/tv-airing-today`
+- `GET /api/media-lists/tv-on-the-air`
+- `GET /api/media-lists/tv-trending-day`
+- `GET /api/media-lists/tv-trending-week`
+- `GET /api/media-lists/person-trending-day`
+- `GET /api/media-lists/person-trending-week`
+
+**可选查询参数：** `snapshot_date`（`Y-m-d`，不传取最新）
+
+---
+
+### 2026-04-12 — person Spec 完成
+
+**完成内容：**
+- 实现 Person API 模块，提供 4 个只读接口
+- 标准分层架构：Person / MovieCredit / TvEpisodeCredit Model → Repository → Service → FormRequest → Resource → Controller → Route
+- 人物列表支持 `gender`（0/1/2/3）、`adult`（0/1）、`known_for_department`、`q`（name 前缀搜索）筛选，默认 `id` 降序，`per_page` 最大 50（大表约束），`page` 最大 1000
+- 人物详情不存在时抛出 `AppException` 返回 `code: 404`，`birthday`/`deathday` 输出 `Y-m-d` 格式
+- 人物参演电影：以 `movie_credits` 为单位，平铺输出 credit 字段（`credit_type`、`character`、`cast_order`、`department_id`、`job_id`）+ movie 字段（`tmdb_id`、`title`、`original_title`、`release_date`、`poster_path`），`with('movie')` 预加载避免 N+1
+- 人物参演电视剧：以 `tv_show` 为单位去重，通过 JOIN `tv_episodes` + `tv_episode_credits` + `DISTINCT` 实现，person 不存在时返回 404
+- `PersonMovieService` / `PersonTvShowService` 均注入 `PersonRepositoryInterface` 做 person 存在性校验
+- 全部路由注册在 `auth:api` middleware 组内，228 个测试全部通过
+
+**已注册路由：**
+- `GET /api/persons`
+- `GET /api/persons/{id}`
+- `GET /api/person-movies?person_id=`
+- `GET /api/person-tv-shows?person_id=`
+
+---
 
 ### ADR-001 — 技术栈选型（2026-03-26）
 

@@ -6,6 +6,7 @@ namespace App\Repositories\Contracts;
 
 use App\Models\Movie;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 interface MovieRepositoryInterface
 {
@@ -21,4 +22,20 @@ interface MovieRepositoryInterface
      * Find a movie by its local id. Returns null when not found.
      */
     public function findById(int $id): ?Movie;
+
+    /**
+     * Find movies by a list of local ids. Returns a Collection keyed by id.
+     *
+     * @param  array<int>  $ids
+     * @return Collection<int, Movie>
+     */
+    public function findByIds(array $ids): Collection;
+
+    /**
+     * Find movies by a list of TMDB ids. Returns a Collection keyed by tmdb_id.
+     *
+     * @param  array<int>  $tmdbIds
+     * @return Collection<int, Movie>
+     */
+    public function findByTmdbIds(array $tmdbIds): Collection;
 }

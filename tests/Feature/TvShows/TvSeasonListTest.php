@@ -6,8 +6,8 @@ namespace Tests\Feature\TvShows;
 
 use App\Models\User;
 use App\Services\TvSeasonService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery\MockInterface;
 use Tests\TestCase;
 
@@ -35,9 +35,9 @@ class TvSeasonListTest extends TestCase
     public function test_returns_paginated_season_list(): void
     {
         $this->mock(TvSeasonService::class, function (MockInterface $mock) {
-            $mock->shouldReceive('getList')
+            $mock->shouldReceive('getAll')
                 ->once()
-                ->andReturn(new LengthAwarePaginator([], 0, 20));
+                ->andReturn(new Collection([]));
         });
 
         $user = User::factory()->create();
@@ -47,10 +47,7 @@ class TvSeasonListTest extends TestCase
             ->assertStatus(200)
             ->assertJson(['code' => 0, 'message' => 'success'])
             ->assertJsonStructure([
-                'data' => [
-                    'list',
-                    'pagination' => ['total', 'page', 'per_page', 'last_page'],
-                ],
+                'data',
             ]);
     }
 

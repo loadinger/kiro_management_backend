@@ -6,6 +6,7 @@ namespace App\Repositories\Contracts;
 
 use App\Models\TvShow;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 interface TvShowRepositoryInterface
 {
@@ -21,4 +22,20 @@ interface TvShowRepositoryInterface
      * Find a tv show by its local id. Returns null when not found.
      */
     public function findById(int $id): ?TvShow;
+
+    /**
+     * Find tv shows by a list of local ids. Returns a Collection keyed by id.
+     *
+     * @param  array<int>  $ids
+     * @return Collection<int, TvShow>
+     */
+    public function findByIds(array $ids): Collection;
+
+    /**
+     * Find tv shows by a list of TMDB ids. Returns a Collection keyed by tmdb_id.
+     *
+     * @param  array<int>  $tmdbIds
+     * @return Collection<int, TvShow>
+     */
+    public function findByTmdbIds(array $tmdbIds): Collection;
 }

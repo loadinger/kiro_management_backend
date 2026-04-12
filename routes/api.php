@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\ArticleItemController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CollectionController;
 use App\Http\Controllers\Api\CountryController;
@@ -9,12 +11,16 @@ use App\Http\Controllers\Api\GenreController;
 use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\Api\KeywordController;
 use App\Http\Controllers\Api\LanguageController;
+use App\Http\Controllers\Api\MediaListSnapshotController;
 use App\Http\Controllers\Api\MovieController;
 use App\Http\Controllers\Api\MovieCreditController;
 use App\Http\Controllers\Api\MovieGenreController;
 use App\Http\Controllers\Api\MovieImageController;
 use App\Http\Controllers\Api\MovieKeywordController;
 use App\Http\Controllers\Api\MovieProductionCompanyController;
+use App\Http\Controllers\Api\PersonController;
+use App\Http\Controllers\Api\PersonMovieController;
+use App\Http\Controllers\Api\PersonTvShowController;
 use App\Http\Controllers\Api\ProductionCompanyController;
 use App\Http\Controllers\Api\TvEpisodeController;
 use App\Http\Controllers\Api\TvEpisodeCreditController;
@@ -116,5 +122,37 @@ Route::middleware('auth:api')->group(function () {
     Route::get('tv-episode-credits', [TvEpisodeCreditController::class, 'index']);
     Route::get('tv-episode-images', [TvEpisodeImageController::class, 'index']);
 
-    // persons 等接口后续在此添加
+    // 媒体榜单快照
+    Route::prefix('media-lists')->group(function () {
+        Route::get('movie-now-playing', [MediaListSnapshotController::class, 'movieNowPlaying']);
+        Route::get('movie-upcoming', [MediaListSnapshotController::class, 'movieUpcoming']);
+        Route::get('movie-trending-day', [MediaListSnapshotController::class, 'movieTrendingDay']);
+        Route::get('movie-trending-week', [MediaListSnapshotController::class, 'movieTrendingWeek']);
+        Route::get('tv-airing-today', [MediaListSnapshotController::class, 'tvAiringToday']);
+        Route::get('tv-on-the-air', [MediaListSnapshotController::class, 'tvOnTheAir']);
+        Route::get('tv-trending-day', [MediaListSnapshotController::class, 'tvTrendingDay']);
+        Route::get('tv-trending-week', [MediaListSnapshotController::class, 'tvTrendingWeek']);
+        Route::get('person-trending-day', [MediaListSnapshotController::class, 'personTrendingDay']);
+        Route::get('person-trending-week', [MediaListSnapshotController::class, 'personTrendingWeek']);
+    });
+
+    // 人物
+    Route::get('persons', [PersonController::class, 'index']);
+    Route::get('persons/{id}', [PersonController::class, 'show']);
+
+    // 人物参演电影
+    Route::get('person-movies', [PersonMovieController::class, 'index']);
+
+    // 人物参演电视剧
+    Route::get('person-tv-shows', [PersonTvShowController::class, 'index']);
+
+    // 专题
+    Route::get('articles', [ArticleController::class, 'index']);
+    Route::post('articles', [ArticleController::class, 'store']);
+    Route::get('articles/{id}', [ArticleController::class, 'show']);
+    Route::put('articles/{id}', [ArticleController::class, 'update']);
+    Route::delete('articles/{id}', [ArticleController::class, 'destroy']);
+
+    // 专题引用项（反向查询）
+    Route::get('article-items', [ArticleItemController::class, 'index']);
 });

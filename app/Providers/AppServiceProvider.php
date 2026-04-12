@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Repositories\ArticleItemRepository;
+use App\Repositories\ArticleRepository;
 use App\Repositories\CollectionRepository;
+use App\Repositories\Contracts\ArticleItemRepositoryInterface;
+use App\Repositories\Contracts\ArticleRepositoryInterface;
 use App\Repositories\Contracts\CollectionRepositoryInterface;
 use App\Repositories\Contracts\CountryRepositoryInterface;
 use App\Repositories\Contracts\DashboardRepositoryInterface;
@@ -13,12 +17,16 @@ use App\Repositories\Contracts\GenreRepositoryInterface;
 use App\Repositories\Contracts\JobRepositoryInterface;
 use App\Repositories\Contracts\KeywordRepositoryInterface;
 use App\Repositories\Contracts\LanguageRepositoryInterface;
+use App\Repositories\Contracts\MediaListSnapshotRepositoryInterface;
 use App\Repositories\Contracts\MovieCreditRepositoryInterface;
 use App\Repositories\Contracts\MovieGenreRepositoryInterface;
 use App\Repositories\Contracts\MovieImageRepositoryInterface;
 use App\Repositories\Contracts\MovieKeywordRepositoryInterface;
 use App\Repositories\Contracts\MovieProductionCompanyRepositoryInterface;
 use App\Repositories\Contracts\MovieRepositoryInterface;
+use App\Repositories\Contracts\PersonMovieRepositoryInterface;
+use App\Repositories\Contracts\PersonRepositoryInterface;
+use App\Repositories\Contracts\PersonTvShowRepositoryInterface;
 use App\Repositories\Contracts\ProductionCompanyRepositoryInterface;
 use App\Repositories\Contracts\TvEpisodeCreditRepositoryInterface;
 use App\Repositories\Contracts\TvEpisodeImageRepositoryInterface;
@@ -40,12 +48,16 @@ use App\Repositories\GenreRepository;
 use App\Repositories\JobRepository;
 use App\Repositories\KeywordRepository;
 use App\Repositories\LanguageRepository;
+use App\Repositories\MediaListSnapshotRepository;
 use App\Repositories\MovieCreditRepository;
 use App\Repositories\MovieGenreRepository;
 use App\Repositories\MovieImageRepository;
 use App\Repositories\MovieKeywordRepository;
 use App\Repositories\MovieProductionCompanyRepository;
 use App\Repositories\MovieRepository;
+use App\Repositories\PersonMovieRepository;
+use App\Repositories\PersonRepository;
+use App\Repositories\PersonTvShowRepository;
 use App\Repositories\ProductionCompanyRepository;
 use App\Repositories\TvEpisodeCreditRepository;
 use App\Repositories\TvEpisodeImageRepository;
@@ -70,6 +82,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(CollectionRepositoryInterface::class, CollectionRepository::class);
+        $this->app->bind(MediaListSnapshotRepositoryInterface::class, MediaListSnapshotRepository::class);
         $this->app->bind(CountryRepositoryInterface::class, CountryRepository::class);
         $this->app->bind(DepartmentRepositoryInterface::class, DepartmentRepository::class);
         $this->app->bind(GenreRepositoryInterface::class, GenreRepository::class);
@@ -80,6 +93,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TvNetworkRepositoryInterface::class, TvNetworkRepository::class);
         $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
         $this->app->bind(MovieRepositoryInterface::class, MovieRepository::class);
+        $this->app->bind(PersonRepositoryInterface::class, PersonRepository::class);
+        $this->app->bind(PersonMovieRepositoryInterface::class, PersonMovieRepository::class);
+        $this->app->bind(PersonTvShowRepositoryInterface::class, PersonTvShowRepository::class);
         $this->app->bind(MovieCreditRepositoryInterface::class, MovieCreditRepository::class);
         $this->app->bind(MovieImageRepositoryInterface::class, MovieImageRepository::class);
         $this->app->bind(MovieGenreRepositoryInterface::class, MovieGenreRepository::class);
@@ -103,6 +119,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TvEpisodeRepositoryInterface::class, TvEpisodeRepository::class);
         $this->app->bind(TvEpisodeCreditRepositoryInterface::class, TvEpisodeCreditRepository::class);
         $this->app->bind(TvEpisodeImageRepositoryInterface::class, TvEpisodeImageRepository::class);
+
+        // Article
+        $this->app->bind(ArticleRepositoryInterface::class, ArticleRepository::class);
+        $this->app->bind(ArticleItemRepositoryInterface::class, ArticleItemRepository::class);
     }
 
     /**

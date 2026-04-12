@@ -111,7 +111,10 @@ class DashboardPropertyTest extends TestCase
 
             // Randomly decide whether to use null or a timestamp
             $useNull = random_int(0, 9) === 0; // ~10% null cases
-            $hoursAgo = random_int(0, 200);
+            // Avoid hoursAgo=48 boundary to prevent race conditions in test execution
+            do {
+                $hoursAgo = random_int(0, 200);
+            } while ($hoursAgo === 48);
 
             if ($useNull) {
                 $lastUpdatedAt = null;

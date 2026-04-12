@@ -59,11 +59,13 @@ users               # 管理员账号管理
 
 ---
 
-## 图片 URL 拼接规则
+## 图片路径规则
 
-数据库存储 TMDB 相对路径（如 `/abc123.jpg`），API 输出时统一由 Resource 层拼接完整 URL。
+数据库存储 TMDB 相对路径（如 `/abc123.jpg`），API 输出时统一由 Resource 层通过 `ImageHelper::url()` 处理后输出。
 
-**基础 URL：** `https://image.tmdb.org/t/p/{size}{path}`
+**输出格式：** 仅返回相对路径，不拼接域名前缀，由前端自行维护 TMDB base URL（`https://image.tmdb.org/t/p`）。
+
+**`$size` 参数保留**，用于标注该字段的推荐尺寸，便于前端按场景选择合适的 size 拼接完整 URL。
 
 ### 各实体图片字段与推荐 size
 
@@ -86,7 +88,7 @@ users               # 管理员账号管理
 ```php
 // ImageHelper 使用示例
 ImageHelper::url($this->poster_path, 'w342')
-// 输出：https://image.tmdb.org/t/p/w342/abc123.jpg
+// 输出：/abc123.jpg（相对路径，不含域名和 size 前缀）
 // path 为 null 时输出：null
 ```
 

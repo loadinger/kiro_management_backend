@@ -20,6 +20,8 @@ class ListTvSeasonRequest extends FormRequest
             'tv_show_id' => ['required', 'integer', 'min:1'],
             'sort' => ['nullable', 'string', Rule::in(['season_number', 'air_date', 'vote_average', 'id'])],
             'order' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
+            'page' => ['nullable', 'integer', 'min:1', 'max:1000'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ];
     }
 
@@ -31,6 +33,8 @@ class ListTvSeasonRequest extends FormRequest
             'tv_show_id.min' => 'tv_show_id 最小值为 1',
             'sort.in' => 'sort 必须是 season_number、air_date、vote_average 或 id',
             'order.in' => 'order 必须是 asc 或 desc',
+            'page.max' => 'page 最大值为 1000',
+            'per_page.max' => 'per_page 最大值为 100',
         ];
     }
 }

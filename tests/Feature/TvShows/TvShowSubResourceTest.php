@@ -37,7 +37,7 @@ class TvShowSubResourceTest extends TestCase
     public function test_genres_returns_listing(): void
     {
         $this->mock(TvShowGenreService::class, function (MockInterface $mock) {
-            $mock->shouldReceive('getList')->once()->andReturn(new Collection());
+            $mock->shouldReceive('getList')->once()->andReturn(new Collection);
         });
 
         $user = User::factory()->create();
@@ -63,7 +63,7 @@ class TvShowSubResourceTest extends TestCase
     public function test_keywords_returns_listing(): void
     {
         $this->mock(TvShowKeywordService::class, function (MockInterface $mock) {
-            $mock->shouldReceive('getList')->once()->andReturn(new Collection());
+            $mock->shouldReceive('getList')->once()->andReturn(new Collection);
         });
 
         $user = User::factory()->create();
@@ -89,7 +89,7 @@ class TvShowSubResourceTest extends TestCase
     public function test_networks_returns_listing(): void
     {
         $this->mock(TvShowNetworkService::class, function (MockInterface $mock) {
-            $mock->shouldReceive('getList')->once()->andReturn(new Collection());
+            $mock->shouldReceive('getList')->once()->andReturn(new Collection);
         });
 
         $user = User::factory()->create();
@@ -115,7 +115,7 @@ class TvShowSubResourceTest extends TestCase
     public function test_production_companies_returns_listing(): void
     {
         $this->mock(TvShowProductionCompanyService::class, function (MockInterface $mock) {
-            $mock->shouldReceive('getList')->once()->andReturn(new Collection());
+            $mock->shouldReceive('getList')->once()->andReturn(new Collection);
         });
 
         $user = User::factory()->create();
@@ -185,7 +185,7 @@ class TvShowSubResourceTest extends TestCase
     public function test_creators_returns_listing(): void
     {
         $this->mock(TvShowCreatorService::class, function (MockInterface $mock) {
-            $mock->shouldReceive('getList')->once()->andReturn(new Collection());
+            $mock->shouldReceive('getList')->once()->andReturn(new Collection);
         });
 
         $user = User::factory()->create();

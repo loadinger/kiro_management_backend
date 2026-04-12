@@ -85,7 +85,7 @@
 | place_of_birth | varchar(255) | 可为空 |
 | profile_path | varchar(255) INDEX | 可为空 |
 | popularity | double INDEX | |
-| known_for_department_id | uint INDEX | → departments.id，可为空 |
+| known_for_department | varchar(255) | 擅长部门名称（如 `Acting`），可为空 |
 | homepage | varchar(500) | 可为空 |
 | imdb_id | varchar(20) | 可为空 |
 | also_known_as | json | 别名列表，可为空 |

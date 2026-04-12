@@ -12,4 +12,14 @@ class Person extends Model
 
     /** @var array<int, string> */
     protected $fillable = [];
+
+    /** @var array<string, string> */
+    protected $casts = [
+        'gender' => 'integer',
+        'adult' => 'boolean',
+        'birthday' => 'date',
+        'deathday' => 'date',
+        'popularity' => 'double',
+        'also_known_as' => 'array',
+    ];
 }

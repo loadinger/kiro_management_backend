@@ -7,6 +7,7 @@ namespace App\Repositories;
 use App\Models\Movie;
 use App\Repositories\Contracts\MovieRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class MovieRepository extends BaseRepository implements MovieRepositoryInterface
 {
@@ -77,5 +78,35 @@ class MovieRepository extends BaseRepository implements MovieRepositoryInterface
     public function findById(int $id): ?Movie
     {
         return Movie::with('collection')->find($id);
+    }
+
+    /**
+     * Find movies by a list of local ids. Returns a Collection keyed by id.
+     *
+     * @param  array<int>  $ids
+     * @return Collection<int, Movie>
+     */
+    public function findByIds(array $ids): Collection
+    {
+        if (empty($ids)) {
+            return collect();
+        }
+
+        return Movie::whereIn('id', $ids)->get()->keyBy('id');
+    }
+
+    /**
+     * Find movies by a list of TMDB ids. Returns a Collection keyed by tmdb_id.
+     *
+     * @param  array<int>  $tmdbIds
+     * @return Collection<int, Movie>
+     */
+    public function findByTmdbIds(array $tmdbIds): Collection
+    {
+        if (empty($tmdbIds)) {
+            return collect();
+        }
+
+        return Movie::whereIn('tmdb_id', $tmdbIds)->get()->keyBy('tmdb_id');
     }
 }

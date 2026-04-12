@@ -7,6 +7,7 @@ namespace App\Repositories;
 use App\Models\TvShow;
 use App\Repositories\Contracts\TvShowRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class TvShowRepository extends BaseRepository implements TvShowRepositoryInterface
 {
@@ -82,5 +83,35 @@ class TvShowRepository extends BaseRepository implements TvShowRepositoryInterfa
     public function findById(int $id): ?TvShow
     {
         return TvShow::find($id);
+    }
+
+    /**
+     * Find tv shows by a list of local ids. Returns a Collection keyed by id.
+     *
+     * @param  array<int>  $ids
+     * @return Collection<int, TvShow>
+     */
+    public function findByIds(array $ids): Collection
+    {
+        if (empty($ids)) {
+            return collect();
+        }
+
+        return TvShow::whereIn('id', $ids)->get()->keyBy('id');
+    }
+
+    /**
+     * Find tv shows by a list of TMDB ids. Returns a Collection keyed by tmdb_id.
+     *
+     * @param  array<int>  $tmdbIds
+     * @return Collection<int, TvShow>
+     */
+    public function findByTmdbIds(array $tmdbIds): Collection
+    {
+        if (empty($tmdbIds)) {
+            return collect();
+        }
+
+        return TvShow::whereIn('tmdb_id', $tmdbIds)->get()->keyBy('tmdb_id');
     }
 }
