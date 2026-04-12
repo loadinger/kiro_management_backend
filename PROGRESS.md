@@ -1,6 +1,6 @@
 # Filmly Management Backend — 开发进度
 
-## 项目状态：准备阶段
+## 项目状态：开发中
 
 ---
 
@@ -78,6 +78,16 @@
 | ML-05 | TV On The Air：即将播出 | 已完成 | list_type=tv_on_the_air |
 | ML-06 | TV Trending：热门剧集（日/周） | 已完成 | list_type=tv_trending_day / tv_trending_week |
 | ML-07 | Person Trending：热门人物（日/周） | 已完成 | list_type=person_trending_day / person_trending_week |
+
+### Articles（专题）
+| # | 接口 | 状态 | 备注 |
+|---|------|------|------|
+| A-01 | Article List：列表，支持 status 筛选、排序 | 已完成 | |
+| A-02 | Article Detail：详情（含 items 分组数组） | 已完成 | |
+| A-03 | Article Store：创建 | 已完成 | |
+| A-04 | Article Update：更新 | 已完成 | |
+| A-05 | Article Delete：删除 | 已完成 | |
+| A-06 | Article Items：按实体反向查询关联专题 | 已完成 | |
 
 ### 基础参考数据
 | # | 接口 | 状态 | 备注 |
@@ -285,6 +295,29 @@ php artisan translate:names --table=keywords --limit=100
 
 ---
 
+### 2026-04-12 — articles Spec 完成
+
+**完成内容：**
+- 实现 Articles（专题）模块，提供 CRUD + 反向查询共 6 个接口
+- 标准分层架构：Article / ArticleItem Model → Repository → Service → FormRequest → Resource → Controller → Route
+- Media 占位符解析：`::media{type="movie" id="123"}` 格式，支持 type/id 顺序互换，非法 type/id 静默忽略，结果去重
+- 保存时在事务中全量同步 `article_items`（先删后插），保证幂等性
+- 详情接口返回 `items` 分组数组（`{ movies: [], tv_shows: [], ... }`），按 entity_type 分组批量查询，防 N+1，所有类型始终存在（无引用时为空数组）
+- slug 可选（nullable），status=published 时 slug 不能为 null
+- 反向查询接口 `GET /api/article-items?entity_type=movie&entity_id=123`，预加载关联专题
+- 两张可写业务表 migration：articles + article_items
+- 全部路由注册在 `auth:api` middleware 组内
+
+**已注册路由：**
+- `GET /api/articles`
+- `POST /api/articles`
+- `GET /api/articles/{id}`
+- `PUT /api/articles/{id}`
+- `DELETE /api/articles/{id}`
+- `GET /api/article-items?entity_type=&entity_id=`
+
+---
+
 ### 2026-04-12 — person Spec 完成
 
 **完成内容：**
@@ -418,6 +451,6 @@ GET /api/tv-episodes?tv_season_id=789
 ## 待决策事项
 
 - [ ] 生产环境部署方案（服务器/容器化）
-- [ ] 专题文章模块的具体字段设计
 - [ ] Redis 缓存策略（哪些接口需要缓存、TTL 设置）
 - [ ] 是否需要操作日志（记录管理员的写操作）
+- [ ] Global Search：`GET /api/search?q=` 待实现
