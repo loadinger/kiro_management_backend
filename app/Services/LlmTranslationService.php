@@ -32,6 +32,13 @@ class LlmTranslationService
 ✓ [{"id":1,"translation":"视效"},{"id":2,"translation":"导演"}]
 PROMPT;
 
+    private readonly string $systemPrompt;
+
+    public function __construct(?string $systemPrompt = null)
+    {
+        $this->systemPrompt = $systemPrompt ?? self::SYSTEM_PROMPT;
+    }
+
     /**
      * Translate a batch of items via Ollama.
      *
@@ -91,13 +98,18 @@ PROMPT;
 
         $userMessage = $this->buildUserMessage($items, $context);
 
+        Log::debug('Ollama request', [
+            'model' => $model,
+            'user_message' => $userMessage,
+        ]);
+
         try {
             $response = Http::timeout(config('services.ollama.timeout', 120))->post("{$baseUrl}/api/chat", [
                 'model' => $model,
                 'format' => 'json',
                 'stream' => false,
                 'messages' => [
-                    ['role' => 'system', 'content' => self::SYSTEM_PROMPT],
+                    ['role' => 'system', 'content' => $this->systemPrompt],
                     ['role' => 'user', 'content' => $userMessage],
                 ],
             ]);
@@ -135,7 +147,23 @@ PROMPT;
             return null;
         }
 
-        return $this->mapById($decoded);
+        $mapped = $this->mapById($decoded);
+
+        // If json_decode lost entries due to duplicate keys (flat object format from small models),
+        // fall back to regex extraction directly from the raw string.
+        if (count($mapped) < count($items)) {
+            $fallback = $this->extractByRegex((string) $raw);
+            if (count($fallback) > count($mapped)) {
+                Log::debug('LlmTranslationService: using regex fallback due to duplicate-key object format', [
+                    'json_decoded_count' => count($mapped),
+                    'regex_count' => count($fallback),
+                ]);
+
+                return $fallback;
+            }
+        }
+
+        return $mapped;
     }
 
     /**
@@ -255,6 +283,38 @@ PROMPT;
             $results[] = [
                 'id' => (int) $id,
                 'translation' => $translation,
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * Fallback parser for flat object format with duplicate keys, e.g.:
+     * {"id":1,"translation":"foo","id":2,"translation":"bar"}
+     *
+     * Uses regex to extract all id+translation pairs in order from the raw string.
+     *
+     * @return array<int, array{id: int, translation: string}>
+     */
+    private function extractByRegex(string $raw): array
+    {
+        // Match all occurrences of "id": <number> followed (anywhere nearby) by "translation": "..."
+        // or "text": "..." to handle model fallback field name.
+        preg_match_all('/"id"\s*:\s*(\d+)/', $raw, $idMatches);
+        preg_match_all('/"(?:translation|text)"\s*:\s*"((?:[^"\\\\]|\\\\.)*)"/', $raw, $translationMatches);
+
+        $ids = $idMatches[1] ?? [];
+        $translations = $translationMatches[1] ?? [];
+
+        // Filter out the task-level "id" fields that aren't item ids by pairing positionally
+        $results = [];
+        $count = min(count($ids), count($translations));
+
+        for ($i = 0; $i < $count; $i++) {
+            $results[] = [
+                'id' => (int) $ids[$i],
+                'translation' => stripslashes($translations[$i]),
             ];
         }
 

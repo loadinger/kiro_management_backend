@@ -14,6 +14,7 @@
 | S-01 | Auth：login / logout / refresh / me | 已完成 | login / logout / refresh / me 全部实现，10 个测试通过 |
 | S-02 | Global Search：`GET /api/search?q=` | 待开始 | 跨表搜索 movies / tv_shows / persons，每表 ≤ 10 条 |
 | S-03 | LLM 翻译：`php artisan translate:names` | 已完成 | Artisan Command + TranslationService + LlmTranslationService 全部实现，migration 已添加 name_zh / translated_at 字段，暂无自动化测试 |
+| S-05 | Article Slug 生成：`php artisan articles:generate-slugs` | 已完成 | 将 articles.title（中文）翻译为英文 slug 写回 articles.slug，只处理 slug IS NULL 的记录，复用 LlmTranslationService |
 | S-04 | Dashboard 数据统计：`GET /api/dashboard/stats` + `GET /api/dashboard/trends` | 已完成 | 各实体总量、近期新增趋势折线图、异步关联完成率、翻译覆盖率、数据新鲜度、每日采集健康度 |
 
 ### Movies
@@ -315,6 +316,28 @@ php artisan translate:names --table=keywords --limit=100
 - `PUT /api/articles/{id}`
 - `DELETE /api/articles/{id}`
 - `GET /api/article-items?entity_type=&entity_id=`
+
+---
+
+### 2026-04-14 — Article Slug 生成模块完成
+
+**完成内容：**
+- `LlmTranslationService`：构造函数新增可选 `$systemPrompt` 参数，支持注入自定义 prompt，向后兼容现有调用方；新增请求日志（model / system_prompt / user_message）；新增正则兜底解析（`extractByRegex`），修复小模型返回扁平对象格式（重复 key）导致 `json_decode` 只保留最后一条的 bug
+- `ArticleSlugService`：游标分页（`WHERE slug IS NULL AND id > $afterId`）、空 title 过滤、LLM 批量翻译、slug 格式化（lowercase → 空格/下划线转 `-` → 保留 `[a-z0-9-]` → 合并连续 `-` → trim → 截断 120）、唯一性冲突处理（`-2` 到 `-99` 后缀）、事务写回
+- `AppServiceProvider`：为 `ArticleSlugService` 注册独立绑定，注入 slug-generation 专用 system prompt，不影响翻译模块的默认 `LlmTranslationService`
+- `GenerateSlugsCommand`（`articles:generate-slugs`）：`--batch-size`（默认 10）/ `--limit`（可选）参数，参数校验，进度条，统计输出（success / skipped_batches），`ConnectionException` 和 `Throwable` 异常捕获
+- 46 个测试全部通过（40 单元 + 6 功能），168 个断言
+
+**用法：**
+```bash
+php artisan articles:generate-slugs --limit=5   # 小批验证质量
+php artisan articles:generate-slugs             # 全量处理
+php artisan articles:generate-slugs --batch-size=20 --limit=100
+```
+
+**Bug 修复（实测发现）：**
+- `formatSlug` 正则由 `[^a-z-]` 改为 `[^a-z0-9-]`，保留年份数字（如 `top-ten-movies-2026`）
+- `LlmTranslationService` 新增 `extractByRegex` 兜底，修复 3b 小模型返回扁平对象格式时只解析出 1 条的问题
 
 ---
 

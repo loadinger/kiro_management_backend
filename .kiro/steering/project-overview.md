@@ -71,7 +71,7 @@ routes/
 
 - 只读：movies / tv_shows / persons 等所有 TMDB 采集数据表
 - 可写：users（管理员账号）、专题文章（待规划）
-- 扩展写入：departments / jobs / keywords / languages 的 `name_zh` / `translated_at` 字段（由翻译任务写入，见下方）
+- 扩展写入：departments / jobs / keywords / languages 的 `name_zh` / `translated_at` 字段（由翻译任务写入，见下方）；articles 的 `slug` 字段（由 slug 生成任务写入，见下方）
 
 详见 `.kiro/steering/data-flow.md`。
 
@@ -147,6 +147,49 @@ php artisan translate:names --table=keywords --limit=100  # 小批验证质量
 
 - `keywords` 支持断点续传（`WHERE name_zh IS NULL`），其余表数据量小无需
 - 显示进度条，输出成功/失败/跳过统计
+
+---
+
+## Article Slug 生成模块
+
+### 背景
+
+专题文章（articles）的 `slug` 字段用于 SEO 友好 URL。前端创建文章时 slug 可为空，由独立 Artisan Command 调用 LLM 将中文 `title` 翻译为英文 slug 并写回。
+
+### 技术方案
+
+- 源字段：`articles.title`（中文标题）
+- 目标字段：`articles.slug`（已存在，nullable varchar）
+- 只处理 `slug IS NULL` 的记录，支持断点续传
+- LLM 环境复用现有 Ollama + Qwen 2.5 7B（`LlmTranslationService`）
+- slug 格式：全小写英文单词，以连字符分隔，如 `"复仇者联盟"` → `"avengers-alliance"`
+
+### 架构分层
+
+```
+Artisan Command (articles:generate-slugs)
+  └── ArticleSlugService（查询待处理记录，写回 slug）
+        └── LlmTranslationService（复用，封装 Ollama 调用）
+```
+
+### Prompt 设计原则
+
+- 告知模型这是影视专题文章标题，目标是生成 SEO slug
+- 输出约束：只含小写字母和连字符，不含数字前缀、标点、空格
+- 正反例：
+  - ✓ `"复仇者联盟"` → `"avengers-alliance"`
+  - ❌ `"复仇者联盟"` → `"The Avengers Alliance"`
+
+### Artisan Command
+
+```bash
+php artisan articles:generate-slugs
+php artisan articles:generate-slugs --batch-size=10
+php artisan articles:generate-slugs --limit=50   # 小批验证质量
+```
+
+- 只处理 `slug IS NULL` 的记录
+- 显示进度条，输出成功/跳过统计
 
 ---
 

@@ -72,6 +72,8 @@ use App\Repositories\TvShowKeywordRepository;
 use App\Repositories\TvShowNetworkRepository;
 use App\Repositories\TvShowProductionCompanyRepository;
 use App\Repositories\TvShowRepository;
+use App\Services\ArticleSlugService;
+use App\Services\LlmTranslationService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -123,6 +125,38 @@ class AppServiceProvider extends ServiceProvider
         // Article
         $this->app->bind(ArticleRepositoryInterface::class, ArticleRepository::class);
         $this->app->bind(ArticleItemRepositoryInterface::class, ArticleItemRepository::class);
+
+        // Bind ArticleSlugService with a dedicated slug-generation system prompt,
+        // keeping the default LlmTranslationService binding (used by TranslationService) unaffected.
+        $this->app->bind(ArticleSlugService::class, function (): ArticleSlugService {
+            $slugSystemPrompt = <<<'PROMPT'
+你是一个专业的影视内容 SEO 助手，专门将中文影视专题文章标题转换为英文 URL slug。
+
+规则：
+1. 提取标题的核心关键词翻译为英文，不要逐字翻译完整标题
+2. slug 应简短精炼，控制在 3~15 个英文单词以内，便于记忆和 SEO
+3. 输出必须是纯英文单词，以连字符分隔
+4. 全部小写，不含大写字母
+5. 不含数字前缀、标点符号、空格、特殊字符
+6. 只输出 slug 本身，不含任何解释或额外文字
+7. 必须处理输入中的每一条，不能遗漏
+
+输入格式：{"task":"generate_slug","items":[{"id":1,"text":"盘点2024年最值得一看的十部科幻电影"},{"id":2,"text":"星际穿越"}]}
+
+输出格式（严格按此 JSON 数组，字段名必须是 id 和 translation，必须包含所有输入条目）：
+[{"id":1,"translation":"best-sci-fi-2024"},{"id":2,"translation":"interstellar"}]
+
+错误示例（禁止）：
+✗ [{"id":1,"translation":"Top-Ten-Most-Worth-Watching-Sci-Fi-Movies-In-2024"}]  （逐字翻译，过长，含大写）
+✗ [{"id":1,"translation":"复仇者联盟"}]                                          （未翻译）
+✗ [{"id":1,"translation":"001-avengers"}]                                        （含数字前缀）
+✓ [{"id":1,"translation":"best-sci-fi-2024"},{"id":2,"translation":"interstellar"}]
+PROMPT;
+
+            return new ArticleSlugService(
+                new LlmTranslationService($slugSystemPrompt),
+            );
+        });
     }
 
     /**
